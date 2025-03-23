@@ -1,0 +1,33 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : Mar 23, 2025, 7:07:38 PM
+    Author     : rober
+*/
+
+.registration-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    padding: 20px;
+}
+.registration-table {
+    width: 100%;
+    max-width: 500px;
+    height: auto;
+    max-height: 700px;
+    overflow-y: auto;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+/* Make the header section look nice */
+.registration-table th {
+    text-align: center;
+    background-color: #f8f9fa;
+}
+.form-control {
+    width: 100%;
+}
