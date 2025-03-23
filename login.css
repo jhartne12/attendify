@@ -23,7 +23,7 @@ Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this t
     border: 1px solid #ddd;
     border-radius: 8px;
 }
-/* Make the header section look nice */
+/* Makes the header section look nicer. */
 .registration-table th {
     text-align: center;
     background-color: #f8f9fa;
