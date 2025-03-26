@@ -27,9 +27,7 @@
                             <a class="nav-link" href="javascript:void(0)">Link</a>
                         </li>
                     </ul>
-                    <form class="d-flex">
-                        <input class="form-control me-2" type="text" placeholder="Search">
-                        <button class="btn btn-primary" type="button">Search</button>
+                    <a href="registration.html" class="btn btn-primary">Register</a>
                     </form>
                 </div>
             </div>
@@ -45,16 +43,13 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td colspan="2">
-                                <label class="form-label">Role</label><br>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="role" id="attendee" value="Attendee" required>
-                                    <label class="form-check-label" for="attendee">Attendee</label>
-                                </div>
-                                <div class="form-check form-check-inline">
-                                    <input class="form-check-input" type="radio" name="role" id="organizer" value="Organizer" required>
-                                    <label class="form-check-label" for="organizer">Organizer</label>
-                                </div>
+                            <td><label for="role" class="form-label">Role:</label></td>
+                            <td>
+                                <select class="form-select" name="role" id="role" required>
+                                    <option value="" disabled selected>Select your role</option>
+                                    <option value="Attendee">Attendee</option>
+                                    <option value="Organizer">Organizer</option>
+                                </select>
                             </td>
                         </tr>
 
@@ -65,7 +60,7 @@
 
                         <tr>
                             <td><label for="username" class="form-label">Username:</label></td>
-                            <td><input type="text" class="form-control" id="username" placeholder="Choose a username" name="username" required></td>
+                            <td><input type="text" class="form-control" id="username" placeholder="Enter a username" name="username" required></td>
                         </tr>
 
                         <tr>
@@ -85,7 +80,7 @@
 
                         <tr>
                             <td><label for="security-answer" class="form-label">Security Answer:</label></td>
-                            <td><input type="text" class="form-control" id="security-answer" placeholder="Answer to your security question" name="security_answer" required></td>
+                            <td><input type="text" class="form-control" id="security-answer" placeholder="Enter your security answer" name="security_answer" required></td>
                         </tr>
 
                         <tr>
