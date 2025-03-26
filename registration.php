@@ -28,7 +28,6 @@
                         </li>
                     </ul>
                     <a href="registration.html" class="btn btn-primary">Register</a>
-                    </form>
                 </div>
             </div>
         </nav>
