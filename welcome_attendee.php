@@ -9,10 +9,11 @@ if (!isset($_SESSION['username'])) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome</title>
+    <title>Welcome Attendee</title>
 </head>
 <body>
-    <h2>Welcome, <?php echo $_SESSION['username']; ?>!</h2>
+    <h2>Welcome, <?php echo $_SESSION['username']; ?> (Attendee)</h2>
+    <p>You have access to attendee features.</p>
     <a href="logout.php">Logout</a>
 </body>
 </html>
