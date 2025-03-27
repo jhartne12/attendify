@@ -1,5 +1,5 @@
 <?php
-include('db.php');
+include('DBConnect.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
