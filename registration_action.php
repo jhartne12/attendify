@@ -8,12 +8,19 @@ $name = $_POST["name"];
 $uname = $_POST["username"];
 $email = $_POST["email"];
 $passwd = $_POST["password"];
+$passwd2 = $_POST["passwd2"];
 $security_question = $_POST["security_question"];
 $security_answer = $_POST["security_answer"];
 
 // checks if password is too short
 if (strlen($passwd) < 8) {
     echo "Password must be at least 8 characters long!";
+    exit;
+}
+
+// checks if password not typed in correctly
+if ($passwd !== $passwd2) {
+    echo "Passwords do not match. Please go back and re-enter your passwords!";
     exit;
 }
 
