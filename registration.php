@@ -27,7 +27,7 @@
                             <a class="nav-link" href="javascript:void(0)">Link</a>
                         </li>
                     </ul>
-                    <a href="registration.html" class="btn btn-primary">Register</a>
+                    <a href="LogInPage.php" class="btn btn-primary">Login</a>
                 </div>
             </div>
         </nav>
@@ -71,6 +71,11 @@
                             <td><label for="password" class="form-label">Password:</label></td>
                             <td><input type="password" class="form-control" id="password" placeholder="Enter password" name="password" required></td>
                         </tr>
+                        
+                        <tr>
+                            <td><label for="passwd2" class="form-label">Confirm Password:</label></td>
+                            <td><input type="password" class="form-control" id="passwd2" placeholder="Enter password" name="passwd2" required></td>
+                        </tr>
 
                         <tr>
                             <td><label for="security-question" class="form-label">Security Question:</label></td>
@@ -91,5 +96,32 @@
                 </table>
             </form>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+            const password = document.getElementById("password");
+            const passwd2 = document.getElementById("passwd2");
+            const submitButton = document.querySelector("button[type='submit']");
+            const passwordError = document.createElement("small");
+
+            passwordError.style.color = "red";
+            passwd2.insertAdjacentElement("afterend", passwordError);
+
+            function validatePasswordMatch() {
+                if (password.value.length < 8) {
+                    passwordError.textContent = "Password is too short!";
+                    submitButton.disabled = true;
+                } else if (passwd2.value !== password.value) {
+                    passwordError.textContent = "Passwords do not match!";
+                    submitButton.disabled = true;
+                } else {
+                    passwordError.textContent = "";
+                    submitButton.disabled = false;
+                }
+            }
+
+            password.addEventListener("input", validatePasswordMatch);
+            passwd2.addEventListener("input", validatePasswordMatch);
+                });
+        </script>
     </body>
 </html>
