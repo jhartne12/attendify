@@ -2,9 +2,10 @@
 
 //connection string
 $servername = "localhost";
-$username = "username";
-$password = "password";
+$username = "root";
+$password = "";
 $dbname = "attendify";
+$conn ="null";
 
 
 // Internal APIs 
