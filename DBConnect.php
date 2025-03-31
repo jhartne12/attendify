@@ -5,7 +5,7 @@ $servername = "localhost";
 $username = "username";
 $password = "password";
 $dbname = "attendify";
-$conn ="null";
+
 
 // Internal APIs 
 function openDB() {

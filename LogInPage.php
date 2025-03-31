@@ -3,13 +3,13 @@ session_start();
 include('DBConnect.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = mysqli_real_escape_string($conn, $_POST['username']);
+    $username = mysqli_real_escape_string( $_POST['username']);
     $password = $_POST['password']; // Using plain text, will verify later
-    $role = mysqli_real_escape_string($conn, $_POST['role']);
+    $role = mysqli_real_escape_string( $_POST['role']);
 
     // Fetch user details from DB
     $query = "SELECT * FROM users WHERE username='$username' AND role='$role'";
-    $result = mysqli_query($conn, $query);
+    $result = mysqli_query( $query);
 
     if (mysqli_num_rows($result) == 1) {
         $user = mysqli_fetch_assoc($result);
@@ -58,6 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         
         <label>Select Role:</label>
         <select name="role" required>
+            <option value="None">None</option>
             <option value="attendee">Attendee</option>
             <option value="organizer">Organizer</option>
             <option value="admin">Admin</option>
