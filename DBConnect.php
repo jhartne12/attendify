@@ -5,7 +5,7 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendify";
-$conn ="null";
+$conn = null;
 
 
 // Internal APIs 
