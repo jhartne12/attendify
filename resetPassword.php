@@ -2,7 +2,7 @@
 include('DBConnect.php');
 
 if (isset($_GET['token'])) {
-    $token = $_GET['token'];
+    $token = $_GET['email'];
 
     $query = "SELECT * FROM users WHERE reset_token='$token' AND token_expiry > NOW()";
     $result = mysqli_query($conn, $query);
