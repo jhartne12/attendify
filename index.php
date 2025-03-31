@@ -39,18 +39,7 @@
 <div class="container-fluid" style="margin-top:80px">
   <h3 style="font-size:50px">Welcome to Attendify</h3>
   <p></p>
-  <h1><?php session_start(); ?>
-        <?php if (isset($_SESSION['username'])): ?>
-            <li class="nav-item">
-                <a class="nav-link" href="welcome_<?php echo $_SESSION['role']; ?>.php">
-                    Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>
-                </a>
-            </li>
-            <li class="nav-item">
-                <a class="nav-link" href="logout.php">Logout</a>
-            </li>
-        <?php else: ?>
-  </h1>
+  <h1></h1>
 </div>
     <footer>
         <li class="nav-item">
