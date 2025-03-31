@@ -1,12 +1,18 @@
 <?php
 include('DBConnect.php');
 
-if (isset($_GET['email'])) {
-    $email = $_GET['email'];
+if (isset($_GET['token'])) {
+    // Ensure you are using the database connection for escaping the token.
+    $token = mysqli_real_escape_string($conn, $_GET['token']);
 
-    $query = "SELECT * FROM users WHERE reset_token='$email' AND token_expiry > NOW()";
-    $result = mysqli_query( $query);
-
+    // Prepare the SQL query to prevent SQL injection
+    $query = "SELECT * FROM users WHERE reset_token = ? AND token_expiry > NOW()";
+    $stmt = mysqli_prepare($connection, $query);
+    mysqli_stmt_bind_param($stmt, 's', $token); // Bind the token as a string
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+    
+    
     if (mysqli_num_rows($result) == 1) {
         if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $new_password = md5($_POST['new_password']);
