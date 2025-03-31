@@ -29,7 +29,7 @@
                 <a class="nav-link" href="registration.php">Register</a>
             </li>
             <li class="nav-item">
-                <a class="nav-link" href="index.php">Log In</a>
+                <a class="nav-link" href="LogInPage.php">Log In</a>
             </li>
         <?php endif; ?>
     </ul>
