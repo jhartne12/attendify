@@ -41,6 +41,10 @@
   <p></p>
   <h1></h1>
 </div>
-
+    <footer>
+        <li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
+            </li> 
+    </footer>
 </body>
 </html>
