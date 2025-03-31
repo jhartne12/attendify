@@ -2,8 +2,8 @@
 include('DBConnect.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $query = $conn->prepare("SELECT * FROM users WHERE username=?");
+    $email = mysqli_real_escape_string( $_POST['email']);
+    $query = prepare("SELECT * FROM users WHERE username=?");
     $query->bind_param("s", $email);
     $query->execute();
     $result = $query->get_result();
@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         $expiry = date('Y-m-d H:i:s', strtotime('+1 hour')); // Token valid for 1 hour
 
         $update_query = "UPDATE users SET reset_token='$token', token_expiry='$expiry' WHERE username='$email'";
-        mysqli_query($conn, $update_query);
+        mysqli_query($update_query);
 
         $reset_link = "http://localhost/login_system/reset_password.php?token=$token";
         
