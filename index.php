@@ -15,7 +15,7 @@
   <a class="navbar-brand" href="index.php">Attendify</a>
   <ul class="navbar-nav">
     <li class="nav-item">
-      <a class="nav-link" href="#">Register</a>
+      <a class="nav-link" href="registration.php">Register</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="LogInPage.php">Log In</a>
@@ -24,7 +24,7 @@
 </nav>
 
 <div class="container-fluid" style="margin-top:80px">
-  <h3>Attendify</h3>
+  <h3 style="font-size:50px">Welcome to Attendify</h3>
   <p></p>
   <h1></h1>
 </div>

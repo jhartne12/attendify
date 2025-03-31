@@ -2,8 +2,8 @@
 
 //connection string
 $servername = "localhost";
-$username = "mahadev";
-$password = "mahadev";
+$username = "username";
+$password = "password";
 $dbname = "attendify";
 $conn;
 
