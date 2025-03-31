@@ -3,8 +3,10 @@ include('DBConnect.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     $email = mysqli_real_escape_string($conn, $_POST['email']);
-    $query = "SELECT * FROM users WHERE username='$email'";
-    $result = mysqli_query($conn, $query);
+    $query = $conn->prepare("SELECT * FROM users WHERE username=?");
+    $query->bind_param("s", $email);
+    $query->execute();
+    $result = $query->get_result();
 
     if (mysqli_num_rows($result) == 1) {
         $token = bin2hex(random_bytes(50)); // Generate token

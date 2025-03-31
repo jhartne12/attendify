@@ -14,14 +14,30 @@
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
   <a class="navbar-brand" href="index.php">Attendify</a>
   <ul class="navbar-nav">
-    <li class="nav-item">
-      <a class="nav-link" href="registration.php">Register</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="LogInPage.php">Log In</a>
-    </li>
+    <?php
+    session_start();
+    if (isset($_SESSION['username'])) {
+        // Show welcome page link if logged in
+        if ($_SESSION['role'] == 'attendee') {
+            echo '<li class="nav-item">
+                    <a class="nav-link" href="welcome_attendee.php">Dashboard</a>
+                  </li>';
+        }
+        echo '<li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
+              </li>';
+    } else {
+    ?>
+      <li class="nav-item">
+        <a class="nav-link" href="registration.php">Register</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="LogInPage.php">Log In</a>
+      </li>
+    <?php } ?>
   </ul>
 </nav>
+
 
 <div class="container-fluid" style="margin-top:80px">
   <h3 style="font-size:50px">Welcome to Attendify</h3>
