@@ -59,13 +59,23 @@ function loginDB($sql, $user, $pwd) {
   $message = openDB();
   if ($message == "Connected") {
     $stmt = $conn->prepare($sql);
-    $stmt->bind_param("ss", $user, $pwd);
+    $stmt->bind_param("s", $user);
     $stmt->execute();
     $result = $stmt->get_result();
-    if (gettype($result) == "object")
-      $message = $result;
-    else
-      $message = $conn->error . "<br>Your SQL:" . $sql;
+    
+    if (gettype($result) == "object") {
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $hashed_password = $row['password'];
+
+                if (password_verify($pwd, $hashed_password)) {
+                    $message = $result;
+                }
+            }
+    } else {
+          $message = $conn->error . "<br>Your SQL:" . $sql;
+    }
+
     closeDB();
   }
   return $message;
