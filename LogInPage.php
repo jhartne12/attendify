@@ -87,6 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             </select><br><br>
             <input type="submit" value="Login">
         </form>
+        <p><a href="registration.php ">Not A Member? Register Here!</a></p>
         <p><a href="forgotPassword.php">Forgot Password?</a></p>
     </body>
 </html>
