@@ -31,7 +31,7 @@ CREATE TABLE `admin` (
   `adminID` int(3) NOT NULL,
   `Name` varchar(40) NOT NULL,
   `username` varchar(20) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `email` varchar(40) NOT NULL,
   `securityQ` varchar(60) NOT NULL,
   `securityA` varchar(50) NOT NULL
@@ -47,7 +47,7 @@ CREATE TABLE `attendee` (
   `attendeeID` int(3) NOT NULL,
   `Name` varchar(40) NOT NULL,
   `username` varchar(20) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `email` varchar(40) NOT NULL,
   `securityQ` varchar(60) NOT NULL,
   `securityA` varchar(50) NOT NULL
@@ -101,7 +101,7 @@ CREATE TABLE `organizer` (
   `organizerID` int(3) NOT NULL,
   `Name` varchar(40) NOT NULL,
   `username` varchar(20) NOT NULL,
-  `password` varchar(20) NOT NULL,
+  `password` varchar(255) NOT NULL,
   `email` varchar(40) NOT NULL,
   `securityQ` varchar(60) NOT NULL,
   `securityA` varchar(50) NOT NULL
