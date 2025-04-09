@@ -2,14 +2,15 @@
 
 //connection string
 $servername = "localhost";
-$username = "mahadev";
-$password = "mahadev";
+$username = "root";
+$password = "";
 $dbname = "attendify";
-$conn;
+$conn = null;
+
 
 // Internal APIs 
 function openDB() {
-  global $servername, $username, $password, $dbname, $conn;
+  global $servername, $username, $password, $dbname;
 
 // Create connection
   $conn = new mysqli($servername, $username, $password, $dbname);

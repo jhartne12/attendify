@@ -12,22 +12,39 @@
 <body style="height:1500px">
 
 <nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
-  <a class="navbar-brand" href="index.php">Attendify</a>
-  <ul class="navbar-nav">
-    <li class="nav-item">
-      <a class="nav-link" href="#">Register</a>
-    </li>
-    <li class="nav-item">
-      <a class="nav-link" href="LogInPage.php">Log In</a>
-    </li>
-  </ul>
+    <a class="navbar-brand" href="index.php">Attendify</a>
+    <ul class="navbar-nav">
+        <?php session_start(); ?>
+        <?php if (isset($_SESSION['username'])): ?>
+            <li class="nav-item">
+                <a class="nav-link" href="welcome_<?php echo $_SESSION['role']; ?>.php">
+                    Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
+            </li>
+        <?php else: ?>
+            <li class="nav-item">
+                <a class="nav-link" href="registration.php">Register</a>
+            </li>
+            <li class="nav-item">
+                <a class="nav-link" href="LogInPage.php">Log In</a>
+            </li>
+        <?php endif; ?>
+    </ul>
 </nav>
 
+
 <div class="container-fluid" style="margin-top:80px">
-  <h3>Attendify</h3>
+  <h3 style="font-size:50px">Welcome to Attendify</h3>
   <p></p>
   <h1></h1>
 </div>
-
+    <footer>
+        <li class="nav-item">
+                <a class="nav-link" href="logout.php">Logout</a>
+            </li> 
+    </footer>
 </body>
 </html>
