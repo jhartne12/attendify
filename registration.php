@@ -108,7 +108,7 @@
 
             function validatePasswordMatch() {
                 if (password.value.length < 8) {
-                    passwordError.textContent = "Password is too short!";
+                    passwordError.textContent = "Password is less than 8 characters!";
                     submitButton.disabled = true;
                 } else if (passwd2.value !== password.value) {
                     passwordError.textContent = "Passwords do not match!";
