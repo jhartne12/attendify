@@ -3,70 +3,90 @@ session_start();
 include('DBConnect.php');
 
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $username = mysqli_real_escape_string( $_POST['username']);
-    $password = $_POST['password']; // Using plain text, will verify later
-    $role = mysqli_real_escape_string( $_POST['role']);
+    $uname = $_POST['uname'];
+    $passwd = $_POST['passwd'];
+    $role = $_POST['role'];
+    switch ($role) {
+        case 'admin':
+            $table = 'admin';
+            $idField = 'adminID';
+            break;
+        case 'attendee':
+            $table = 'attendee';
+            $idField = 'attendeeID';
+            break;
+        case 'organizer':
+            $table = 'organizer';
+            $idField = 'organizerID';
+            break;
+        default:
+            $error = "Invalid role.";
+            break;
+    }
 
-    // Fetch user details from DB
-    $query = "SELECT * FROM users WHERE username='$username' AND role='$role'";
-    $result = mysqli_query( $query);
+    if (isset($table)) {
+        $sql = "SELECT $idField, Name, password FROM $table WHERE username = ?";
+        $result = loginDB($sql, $uname, $passwd);
 
-    if (mysqli_num_rows($result) == 1) {
-        $user = mysqli_fetch_assoc($result);
-        
-        // Verify password using password_verify
-        if (password_verify($password, $user['password'])) {
-            session_regenerate_id(true);
-            $_SESSION['username'] = $username;
-            $_SESSION['role'] = $role;
+        if (gettype($result) == "object") {
+            if ($result->num_rows > 0) {
+                $row = $result->fetch_assoc();
+                $userID = $row[$idField];
+                $name = $row['Name'];
+                $role = $table;
 
-            // Redirect based on role
-            switch ($role) {
-                case 'attendee':
-                    header('Location: welcome_attendee.php');
-                    exit();
-                case 'organizer':
-                    header('Location: welcome_organizer.php');
-                    exit();
-                case 'admin':
-                    header('Location: welcome_admin.php');
-                    exit();
+                // Start session and save user data
+                $_SESSION['userID'] = $userID;
+                $_SESSION['name'] = $name;
+                $_SESSION['role'] = $role;
+
+                // Redirect based on role
+                switch ($role) {
+                    case 'admin':
+                        header('Location: welcome_admin.php');
+                        break;
+                    case 'attendee':
+                        header('Location: welcome_attendee.php');
+                        break;
+                    case 'organizer':
+                        header('Location: welcome_organizer.php');
+                        break;
+                    default:
+                        header('Location: welcome.php');
+                        break;
+                }
+                exit;
+            } else {
+                $error = "Invalid username or password!";
             }
-        } else {
-            $error = "Invalid username, password, or role!";
         }
-    } else {
-        $error = "Invalid username, password, or role!";
     }
 }
 ?>
 
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Login Page</title>
-</head>
-<body>
-    <h2>Login</h2>
-    <?php if (isset($error)) { echo "<p>" . htmlspecialchars($error) . "</p>"; } ?>
-    <form method="POST" action="index.php">
-        <label>Username:</label>
-        <input type="text" name="username" required><br><br>
-        
-        <label>Password:</label>
-        <input type="password" name="password" required><br><br>
-        
-        <label>Select Role:</label>
-        <select name="role" required>
-            <option value="None">None</option>
-            <option value="attendee">Attendee</option>
-            <option value="organizer">Organizer</option>
-            <option value="admin">Admin</option>
-        </select><br><br>
-        
-        <input type="submit" value="Login">
-    </form>
-    
-    <p><a href="forgotPassword.php">Forgot Password?</a></p>
-</body>
+    <head>
+        <title>Login Page</title>
+    </head>
+    <body>
+        <h2>Login</h2>
+<?php if (isset($error)) {
+    echo "<p style='color:red;'>$error</p>";
+} ?>
+        <form method="POST" action="">
+            <label>Username:</label>
+            <input type="text" name="uname" required><br><br>
+            <label>Password:</label>
+            <input type="password" name="passwd" required><br><br>
+            <label>Select Role:</label>
+            <select name="role" required>
+                <option value="attendee">Attendee</option>
+                <option value="organizer">Organizer</option>
+                <option value="admin">Admin</option>
+            </select><br><br>
+            <input type="submit" value="Login">
+        </form>
+        <p><a href="forgotPassword.php">Forgot Password?</a></p>
+    </body>
 </html>
