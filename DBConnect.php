@@ -5,12 +5,12 @@ $servername = "localhost";
 $username = "root";
 $password = "";
 $dbname = "attendify";
-$conn = null;
+$conn;
 
 
 // Internal APIs 
 function openDB() {
-  global $servername, $username, $password, $dbname;
+  global $servername, $username, $password, $dbname, $conn;
 
 // Create connection
   $conn = new mysqli($servername, $username, $password, $dbname);
