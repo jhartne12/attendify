@@ -31,10 +31,10 @@ $sql = "INSERT INTO event (organizerID, Name, date, address, description, catego
 
 // Execute query and check if it was successful
 if (modifyDB($sql)) {
-    echo "Event created successfully!<br>Redirecting you to the event list page.";
+    echo "Event created successfully!<br>Redirecting you to the front page.";
     echo "<script>
         setTimeout(function() {
-        window.location.href = 'event_list.php';
+        window.location.href = 'index.php';
         }, 5000);
         </script>";
 } else {
