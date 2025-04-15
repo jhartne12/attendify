@@ -47,11 +47,11 @@ $result = queryDB($sql);
         </div>
     </nav>
 
-    <div class="container-fluid" style="margin-top:10px">
-        <h3 style="font-size:50px">Welcome to Attendify</h3>
+    <div class="container-fluid d-flex flex-column align-items-center" style="margin-top:10px">
+        <h3 style="font-size:50px" class="text-center">Welcome to Attendify</h3>
         <br>
         <h4 class="text-center">Available Events</h4>
-        <table class="table table-bordered">
+        <table class="table table-bordered w-75">
             <thead>
                 <tr>
                     <th>Event Name</th>
@@ -68,34 +68,41 @@ $result = queryDB($sql);
                     while ($row = $result->fetch_assoc()) {
                         $category = '';
                         switch ($row['categoryID']) {
-                            case 1: $category = 'Conference'; break;
-                            case 2: $category = 'Workshop'; break;
-                            case 3: $category = 'Seminar'; break;
-                            case 4: $category = 'Meetup'; break;
-                            case 5: $category = 'Webinar'; break;
-                            case 6: $category = 'Social'; break;
-                            default: $category = 'Unknown'; break;
+                            case 1: $category = 'Conference';
+                                break;
+                            case 2: $category = 'Workshop';
+                                break;
+                            case 3: $category = 'Seminar';
+                                break;
+                            case 4: $category = 'Meetup';
+                                break;
+                            case 5: $category = 'Webinar';
+                                break;
+                            case 6: $category = 'Social';
+                                break;
+                            default: $category = 'Unknown';
+                                break;
                         }
-                        
+
                         $isAttendee = isset($_SESSION['role']) && $_SESSION['role'] == 'Attendee';
 
                         echo "<tr>
-                                <td>{$row['Name']}</td>
-                                <td>{$row['date']}</td>
-                                <td>{$row['address']}</td>
-                                <td>{$row['description']}</td>
-                                <td>{$category}</td>
-                                <td>";
+                            <td>{$row['Name']}</td>
+                            <td>{$row['date']}</td>
+                            <td>{$row['address']}</td>
+                            <td>{$row['description']}</td>
+                            <td>{$category}</td>
+                            <td>";
 
                         if ($isAttendee) {
                             echo "<form action='signup_event.php' method='POST'>
-                                    <input type='hidden' name='eventID' value='{$row['eventID']}'>
-                                    <button type='submit' class='btn btn-success'>Sign Up</button>
-                                  </form>";
+                                <input type='hidden' name='eventID' value='{$row['eventID']}'>
+                                <button type='submit' class='btn btn-success'>Sign Up</button>
+                              </form>";
                         } else {
-                            echo "<button class='btn btn-secondary' disabled data-bs-toggle='tooltip' data-bs-placement='top' title='Register to sign up for events'>Sign Up</button>";    
+                            echo "<button class='btn btn-secondary' disabled data-bs-toggle='tooltip' data-bs-placement='top'>Register to sign up!</button>";
                         }
-                        
+
                         echo "</td></tr>";
                     }
                 } else {
@@ -105,6 +112,7 @@ $result = queryDB($sql);
             </tbody>
         </table>
     </div>
+
 
     <footer>
         <li class="nav-item">
