@@ -11,26 +11,6 @@
 </head>
 <body style="height:1500px">
 
-<nav class="navbar navbar-expand-sm bg-dark navbar-dark fixed-top">
-  <a class="navbar-brand" href="index.php">Attendify</a>
-  <ul class="navbar-nav">
-    <?php if (isset($_SESSION["email"])): ?>
-      <li class="nav-item">
-        <a class="nav-link" href="#">Welcome, <?= htmlspecialchars($_SESSION["email"]) ?></a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="Logout.php">Log Out</a>
-      </li>
-    <?php else: ?>
-      <li class="nav-item">
-        <a class="nav-link" href="registration.php">Register</a>
-      </li>
-      <li class="nav-item">
-        <a class="nav-link" href="LogInPage.php">Log In</a>
-      </li>
-    <?php endif; ?>
-  </ul>
-</nav>
 
 
 <div class="container-fluid" style="margin-top:80px">
