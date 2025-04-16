@@ -14,6 +14,8 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
 <body>
     <h2>Welcome, <?php echo $_SESSION['username']; ?> (Admin)</h2>
     <p>You have access to admin features.</p>
+    <a href="adminsregistration.php">Need to create a user? Click Here!</a>
+    <br>
     <a href="logout.php">Logout</a>
 </body>
 </html>

@@ -1,6 +1,11 @@
 <?php
 session_start();
 include('DBConnect.php');
+
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
+    header('Location: index.php');
+    exit();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -33,7 +38,12 @@ include('DBConnect.php');
                             <a class="nav-link" href="javascript:void(0)">Link</a>
                         </li>
                     </ul>
-                    <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                    <?php if (isset($_SESSION['username'])): ?>
+                        <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
+                        <a href="logout.php" class="btn btn-danger ms-2">Logout</a>
+                    <?php else: ?>
+                        <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>
@@ -55,6 +65,11 @@ include('DBConnect.php');
                         <tr>
                             <td><label for="event_date" class="form-label">Date:</label></td>
                             <td><input type="date" class="form-control" id="event_date" name="event_date" required></td>
+                        </tr>
+                        
+                        <tr>
+                            <td><label for="event_time" class="form-label">Time:</label></td>
+                            <td><input type="time" class="form-control" id="event_time" name="event_time" required></td>
                         </tr>
 
                         <tr>

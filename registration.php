@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Registration</title>
+        <title>Event Creation</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="registration.css" rel="stylesheet" type="text/css">
@@ -29,7 +29,12 @@
                             <a class="nav-link" href="javascript:void(0)">Link</a>
                         </li>
                     </ul>
-                    <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                    <?php if (isset($_SESSION['username'])): ?>
+                        <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
+                        <a href="logout.php" class="btn btn-danger ms-2">Logout</a>
+                    <?php else: ?>
+                        <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>
