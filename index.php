@@ -18,6 +18,7 @@ $result = queryDB($sql);
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
   <link rel="stylesheet" type="text/css" href="style.css">
 </head>
+
 <body>
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
@@ -112,6 +113,7 @@ $result = queryDB($sql);
             </tbody>
         </table>
     </div>
+
 
 
     <footer>
