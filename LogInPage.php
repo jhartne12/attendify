@@ -1,13 +1,14 @@
 <?php
 session_start();
 include("DBConnect.php");
-openDB();
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $email = trim($_POST["email"]);
   $password = $_POST["password"];
 
   // Use prepared statement to avoid SQL injection
-  $stmt = $conn->prepare("SELECT email, password, role FROM users WHERE email = ?");
+  $sql = "SELECT * FROM users WHERE email = ?";
+  $result = loginDB($sql, $email, $password);
   $stmt->bind_param("s", $email);
   $stmt->execute();
   $result = $stmt->get_result();
