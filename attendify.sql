@@ -76,6 +76,7 @@ CREATE TABLE `event` (
   `Name` varchar(40) NOT NULL,
   `date` datetime NOT NULL,
   `address` varchar(50) NOT NULL,
+  `description` varchar(255) NOT NULL,
   `categoryID` int(3) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
