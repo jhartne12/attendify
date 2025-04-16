@@ -3,7 +3,10 @@ session_start();
 include('DBConnect.php');
 
 // Query to fetch the events
-$sql = "SELECT eventID, Name, date, address, description, categoryID FROM event";
+$sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address, event.description, event.categoryID, organizer.Name AS organizerName 
+        FROM event 
+        JOIN organizer ON event.organizerID = organizer.organizerID";
+
 $result = queryDB($sql);
 ?>
 
@@ -88,7 +91,7 @@ $result = queryDB($sql);
                         $isAttendee = isset($_SESSION['role']) && $_SESSION['role'] == 'attendee';
 
                         echo "<tr>
-                            <td>{$row['Name']}</td>
+                            <td><strong>{$row['eventName']}</strong><br><small class='text-muted'>by {$row['organizerName']}</small></td>
                             <td>{$row['date']}</td>
                             <td>{$row['address']}</td>
                             <td>{$row['description']}</td>
@@ -113,14 +116,6 @@ $result = queryDB($sql);
             </tbody>
         </table>
     </div>
-
-
-
-    <footer>
-        <li class="nav-item">
-            <a class="nav-link" href="logout.php">Logout</a>
-        </li> 
-    </footer>
 
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
