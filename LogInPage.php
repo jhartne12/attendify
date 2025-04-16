@@ -7,7 +7,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
   $password = $_POST["password"];
 
   // Use prepared statement to avoid SQL injection
-  $sql = "SELECT * FROM users WHERE email = ?";
+  $sql = "SELECT * FROM attendee WHERE email = ?";
   $result = loginDB($sql, $email, $password);
   $stmt->bind_param("s", $email);
   $stmt->execute();
