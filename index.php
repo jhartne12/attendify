@@ -114,14 +114,6 @@ $result = queryDB($sql);
         </table>
     </div>
 
-
-
-    <footer>
-        <li class="nav-item">
-            <a class="nav-link" href="logout.php">Logout</a>
-        </li> 
-    </footer>
-
     <script>
         var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
