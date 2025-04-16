@@ -66,6 +66,11 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
                             <td><label for="event_date" class="form-label">Date:</label></td>
                             <td><input type="date" class="form-control" id="event_date" name="event_date" required></td>
                         </tr>
+                        
+                        <tr>
+                            <td><label for="event_time" class="form-label">Time:</label></td>
+                            <td><input type="time" class="form-control" id="event_time" name="event_time" required></td>
+                        </tr>
 
                         <tr>
                             <td><label for="event_address" class="form-label">Address:</label></td>
