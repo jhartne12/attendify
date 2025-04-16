@@ -14,6 +14,8 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
 <body>
     <h2>Welcome, <?php echo $_SESSION['username']; ?> (Organizer)</h2>
     <p>You have access to organizer features.</p>
+    <a href="event.php">Creating an event? Click Here!</a>
+    <br>
     <a href="logout.php">Logout</a>
 </body>
 </html>
