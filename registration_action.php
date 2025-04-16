@@ -40,7 +40,11 @@ if ($passwd !== $passwd2) {
 }
 
 // checks if username is duplicate
-$sql_check_uname = "SELECT * FROM attendee WHERE username = '$uname' UNION SELECT * FROM organizer WHERE username = '$uname'";
+$sql_check_uname = "
+  SELECT username FROM attendee WHERE username = '$uname' 
+  UNION 
+  SELECT username FROM organizer WHERE username = '$uname'";
+
 $result_uname = queryDB($sql_check_uname);
 if ($result_uname->num_rows > 0) {
     echo "Username already exists. Please choose a different username!";
