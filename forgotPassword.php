@@ -1,50 +1,34 @@
 <?php
-include('DBConnect.php');
+include("DBConnect.php");
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = mysqli_real_escape_string( $_POST['email']);
-    $query = prepare("SELECT * FROM users WHERE username=?");
-    $query->bind_param("s", $email);
-    $query->execute();
-    $result = $query->get_result();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $email = trim($_POST["email"]);
 
-    if (mysqli_num_rows($result) == 1) {
-        $token = bin2hex(random_bytes(50)); // Generate token
-        $expiry = date('Y-m-d H:i:s', strtotime('+1 hour')); // Token valid for 1 hour
+  $stmt = $conn->prepare("SELECT email FROM users WHERE email = ?");
+  $stmt->bind_param("s", $email);
+  $stmt->execute();
+  $result = $stmt->get_result();
 
-        $update_query = "UPDATE users SET reset_token='$token', token_expiry='$expiry' WHERE username='$email'";
-        mysqli_query($update_query);
+  if ($result->num_rows > 0) {
+    // Generate token & expiration
+    $token = bin2hex(random_bytes(32));
+    $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
 
-        $reset_link = "http://localhost/login_system/reset_password.php?token=$token";
-        
-        // Send email (Replace with your mail function)
-        $to = $email;
-        $subject = "Password Reset";
-        $message = "Click on this link to reset your password: $reset_link";
-        $headers = "From: noreply@yourdomain.com";
+    $update = $conn->prepare("UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?");
+    $update->bind_param("sss", $token, $expiry, $email);
+    $update->execute();
 
-        if (mail($to, $subject, $message, $headers)) {
-            echo "A password reset link has been sent to your email!";
-        } else {
-            echo "Failed to send reset link. Check mail configuration.";
-        }
-    } else {
-        echo "No user found with that email!";
-    }
+    // Simulate sending email (in production, send this link)
+    $resetLink = "http://yourdomain.com/resetPassword.php?token=" . urlencode($token);
+    echo "Password reset link (send via email): <a href='$resetLink'>$resetLink</a>";
+  } else {
+    echo "Email not found!";
+  }
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Forgot Password</title>
-</head>
-<body>
-    <h2>Forgot Password</h2>
-    <form method="POST" action="forgotPassword.php">
-        <label>Enter your email:</label>
-        <input type="email" name="email" required><br><br>
-        <input type="submit" value="Send Reset Link">
-    </form>
-</body>
-</html>
+<!-- HTML Form -->
+<form method="post" action="">
+  Enter your email to reset password: <input type="email" name="email" required>
+  <input type="submit" value="Submit">
+</form>

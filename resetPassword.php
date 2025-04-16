@@ -1,51 +1,50 @@
 <?php
-include('DBConnect.php');
+include("DBConnect.php");
 
-if (isset($_GET['token'])) {
-    // Ensure you are using the database connection for escaping the token.
-    $token = mysqli_real_escape_string($conn, $_GET['token']);
+$token = $_GET["token"] ?? '';
 
-    // Prepare the SQL query to prevent SQL injection
-    $query = "SELECT * FROM users WHERE reset_token = ? AND token_expiry > NOW()";
-    $stmt = mysqli_prepare($connection, $query);
-    mysqli_stmt_bind_param($stmt, 's', $token); // Bind the token as a string
-    mysqli_stmt_execute($stmt);
-    $result = mysqli_stmt_get_result($stmt);
-    
-    
-    if (mysqli_num_rows($result) == 1) {
-        if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-            $new_password = md5($_POST['new_password']);
-            $update_query = "UPDATE users SET password='$new_password', reset_token=NULL, token_expiry=NULL WHERE reset_token='$token'";
-            
-            if (mysqli_query( $update_query)) {
-                echo "Password reset successfully! <a href='index.php'>Login</a>";
-                exit();
-            } else {
-                echo "Error resetting password!";
-            }
-        }
+if (!$token) {
+  die("Invalid or missing token.");
+}
+
+$stmt = $conn->prepare("SELECT email, reset_token_expiry FROM users WHERE reset_token = ?");
+$stmt->bind_param("s", $token);
+$stmt->execute();
+$result = $stmt->get_result();
+
+if ($result->num_rows !== 1) {
+  die("Invalid token.");
+}
+
+$row = $result->fetch_assoc();
+if (strtotime($row["reset_token_expiry"]) < time()) {
+  die("Token has expired.");
+}
+
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+  $newPassword = $_POST["new_password"];
+  
+  if (strlen($newPassword) < 6) {
+    echo "Password must be at least 6 characters.";
+  } else {
+    $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
+    $email = $row["email"];
+
+    // Clear token and update password
+    $update = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE email = ?");
+    $update->bind_param("ss", $hashed, $email);
+
+    if ($update->execute()) {
+      echo "Password successfully reset.";
     } else {
-        echo "Invalid or expired token!";
-        exit();
+      echo "Error updating password.";
     }
-} else {
-    echo "Invalid request!";
-    exit();
+  }
 }
 ?>
 
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Reset Password</title>
-</head>
-<body>
-    <h2>Reset Your Password</h2>
-    <form method="POST" action="">
-        <label>New Password:</label>
-        <input type="password" name="new_password" required><br><br>
-        <input type="submit" value="Reset Password">
-    </form>
-</body>
-</html>
+<!-- HTML Form -->
+<form method="post">
+  New Password: <input type="password" name="new_password" required>
+  <input type="submit" value="Reset Password">
+</form>
