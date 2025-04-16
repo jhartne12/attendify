@@ -29,7 +29,11 @@
                             <a class="nav-link" href="javascript:void(0)">Link</a>
                         </li>
                     </ul>
-                    <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                    <?php if (isset($_SESSION['username'])): ?>
+                        <a href="logout.php" class="btn btn-danger">Logout</a>
+                    <?php else: ?>
+                        <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                    <?php endif; ?>
                 </div>
             </div>
         </nav>
