@@ -85,7 +85,7 @@ $result = queryDB($sql);
                                 break;
                         }
 
-                        $isAttendee = isset($_SESSION['role']) && $_SESSION['role'] == 'Attendee';
+                        $isAttendee = isset($_SESSION['role']) && $_SESSION['role'] == 'attendee';
 
                         echo "<tr>
                             <td>{$row['Name']}</td>
