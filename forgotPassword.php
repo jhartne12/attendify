@@ -1,35 +1,49 @@
 <?php
+session_start();
 include("DBConnect.php");
+
 openDB();
 global $conn;
+
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $email = trim($_POST["email"]);
+    $email = trim($_POST["email"]);
+    $tables = ["attendee", "organizer", "admin"];
+    $found = false;
 
-  $stmt = $conn->prepare("SELECT email FROM attendee WHERE email = ?");
-  $stmt->bind_param("s", $email);
-  $stmt->execute();
-  $result = $stmt->get_result();
+    foreach ($tables as $table) {
+        $stmt = $conn->prepare("SELECT email FROM $table WHERE email = ?");
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-  if ($result->num_rows > 0) {
-    // Generate token & expiration
-    $token = bin2hex(random_bytes(32));
-    $expiry = date("Y-m-d H:i:s", strtotime("+1 hour"));
+        if ($result && $result->num_rows > 0) {
+            // Simulate a reset link with role info in the URL
+            $reset_link = "resetPassword.php?email=" . urlencode($email) . "&role=" . $table;
+            echo "Password reset link: <a href='$reset_link'>$reset_link</a>";
+            $found = true;
+            break;
+        }
+    }
 
-    $update = $conn->prepare("UPDATE users SET reset_token = ?, reset_token_expiry = ? WHERE email = ?");
-    $update->bind_param("sss", $token, $expiry, $email);
-    $update->execute();
+    if (!$found) {
+        echo "Email not found in any user table.";
+    }
 
-    // Simulate sending email (in production, send this link)
-    $resetLink = "http://yourdomain.com/resetPassword.php?token=" . urlencode($token);
-    echo "Password reset link (send via email): <a href='$resetLink'>$resetLink</a>";
-  } else {
-    echo "Email not found!";
-  }
+    closeDB();
 }
 ?>
 
-<!-- HTML Form -->
-<form method="post" action="">
-  Enter your email to reset password: <input type="email" name="email" required>
-  <input type="submit" value="Submit">
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Forgot Password - Attendify</title>
+</head>
+<body>
+  <h2>Forgot Password</h2>
+  <form method="post">
+    <label>Email:</label>
+    <input type="email" name="email" required>
+    <input type="submit" value="Send Reset Link">
+  </form>
+</body>
+</html>

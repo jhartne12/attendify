@@ -1,50 +1,56 @@
 <?php
+session_start();
 include("DBConnect.php");
 
-$token = $_GET["token"] ?? '';
+openDB();
+global $conn;
 
-if (!$token) {
-  die("Invalid or missing token.");
+// Validate that role and email are provided
+if (!isset($_GET["email"]) || !isset($_GET["role"])) {
+    die("Invalid password reset request.");
 }
 
-$stmt = $conn->prepare("SELECT email, reset_token_expiry FROM users WHERE reset_token = ?");
-$stmt->bind_param("s", $token);
-$stmt->execute();
-$result = $stmt->get_result();
+$email = trim($_GET["email"]);
+$role = trim($_GET["role"]);
+$allowed_roles = ["attendee", "organizer", "admin"];
 
-if ($result->num_rows !== 1) {
-  die("Invalid token.");
-}
-
-$row = $result->fetch_assoc();
-if (strtotime($row["reset_token_expiry"]) < time()) {
-  die("Token has expired.");
+if (!in_array($role, $allowed_roles)) {
+    die("Invalid role specified.");
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $newPassword = $_POST["new_password"];
-  
-  if (strlen($newPassword) < 6) {
-    echo "Password must be at least 6 characters.";
-  } else {
-    $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
-    $email = $row["email"];
+    $new_password = $_POST["new_password"];
 
-    // Clear token and update password
-    $update = $conn->prepare("UPDATE users SET password = ?, reset_token = NULL, reset_token_expiry = NULL WHERE email = ?");
-    $update->bind_param("ss", $hashed, $email);
-
-    if ($update->execute()) {
-      echo "Password successfully reset.";
+    if (strlen($new_password) < 6) {
+        echo "Password must be at least 6 characters long.";
     } else {
-      echo "Error updating password.";
+        $hashed = password_hash($new_password, PASSWORD_DEFAULT);
+
+        $stmt = $conn->prepare("UPDATE $role SET password = ? WHERE email = ?");
+        $stmt->bind_param("ss", $hashed, $email);
+
+        if ($stmt->execute()) {
+            echo "Password reset successfully! You can now <a href='LogInPage.php'>Log in</a>.";
+        } else {
+            echo "Error resetting password. Please try again.";
+        }
     }
-  }
 }
+
+closeDB();
 ?>
 
-<!-- HTML Form -->
-<form method="post">
-  New Password: <input type="password" name="new_password" required>
-  <input type="submit" value="Reset Password">
-</form>
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Reset Password - Attendify</title>
+</head>
+<body>
+  <h2>Reset Your Password</h2>
+  <form method="post">
+    <label>New Password:</label>
+    <input type="password" name="new_password" required>
+    <input type="submit" value="Reset Password">
+  </form>
+</body>
+</html>
