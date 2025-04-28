@@ -1,67 +1,90 @@
 <?php
 session_start();
-include("DBConnect.php");
+require_once 'DBConnect.php';
 
-openDB();
-global $conn;
+$error = "";
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-  $email = trim($_POST["email"]);
-  $password = $_POST["password"];
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = htmlspecialchars(trim($_POST['email']));
+    $password = htmlspecialchars(trim($_POST['password']));
+    $role = htmlspecialchars(trim($_POST['role']));
 
-  $sql = "
-    SELECT email, password, 'attendee' AS role FROM attendee WHERE email = ?
-    UNION
-    SELECT email, password, 'organizer' AS role FROM organizer WHERE email = ?
-    UNION
-    SELECT email, password, 'admin' AS role FROM admin WHERE email = ?
-  ";
-
-  $stmt = $conn->prepare($sql);
-  $stmt->bind_param("sss", $email, $email, $email);
-  $stmt->execute();
-  $result = $stmt->get_result();
-
-  if ($result->num_rows === 1) {
-    $row = $result->fetch_assoc();
-
-    if (true) {
-      $_SESSION["email"] = $row["email"];
-      $_SESSION["role"] = $row["role"];
-
-      switch ($row["role"]) {
-        case "admin":
-          header("Location: welcome_admin.php");
-          break;
-        case "organizer":
-          header("Location: welcome_organizer.php");
-          break;
-        case "attendee":
-          header("Location: welcome_attendee.php");
-          break;
-      }
-      exit();
+    if (empty($email) || empty($password) || empty($role)) {
+        $error = "All fields are required.";
     } else {
-      echo "Invalid email or password!";
+        $conn = openDB();
+
+        // Determine the correct table and redirect page
+        if ($role == "attendee") {
+            $table = "attendee";
+            $redirect = "welcome_attendee.php";
+        } elseif ($role == "organizer") {
+            $table = "organizer";
+            $redirect = "welcome_organizer.php";
+        } elseif ($role == "admin") {
+            $table = "admin";
+            $redirect = "welcome_admin.php";
+        } else {
+            $error = "Invalid role selected.";
+        }
+
+        if (empty($error)) {
+            $stmt = $conn->prepare("SELECT * FROM $table WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $result = $stmt->get_result();
+
+            if ($result->num_rows === 1) {
+                $user = $result->fetch_assoc();
+
+                // Verify the hashed password
+                if (password_verify($password, $user['password'])) {
+                    $_SESSION['email'] = $email;
+                    $_SESSION['role'] = $role;
+                    header("Location: $redirect");
+                    exit();
+                } else {
+                    $error = "Incorrect password.";
+                }
+            } else {
+                $error = "No user found with that email.";
+            }
+
+            $stmt->close();
+        }
+        $conn->close();
     }
-  } else {
-    echo "Invalid email or password!";
-  }
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Login</title>
+    <meta charset="UTF-8">
+    <title>Login Page</title>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h2>Login</h2>
-  <form method="post" action="">
-    Email: <input type="text" name="email" required><br>
-    Password: <input type="password" name="password" required><br>
-    <input type="submit" value="Login">
-  </form>
+    <h2 style="text-align:left;">Login</h2>
+    <form method="POST" action="LogInPage.php" style="margin:auto;">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="password">Password:</label><br>
+        <input type="password" id="password" name="password" required><br><br>
+
+        <label for="role">Select Role:</label><br>
+        <select id="role" name="role" required>
+            <option value="">--Select--</option>
+            <option value="attendee">Attendee</option>
+            <option value="organizer">Organizer</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
+
+        <input type="submit" value="Login"><br><br>
+
+        <?php if (!empty($error)) echo "<p style='color:red;'>$error</p>"; ?>
+    </form>
   <p><a href="registration.php">Not A Member? Register Here!</a></p>
   <p><a href="forgotPassword.php">Forgot Password?</a></p>
 </body>
