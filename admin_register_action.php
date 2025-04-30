@@ -1,4 +1,9 @@
 <?php
+session_start();
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
+    echo "<p style='text-align:center; color:red;'>You are not allowed here.</p>";
+    exit();
+}
 
 require "DBConnect.php";
 
@@ -40,7 +45,7 @@ if ($passwd !== $passwd2) {
 }
 
 // checks if username is duplicate
-$sql_check_uname = "SELECT * FROM attendee WHERE username = '$uname' UNION SELECT * FROM organizer WHERE username = '$uname'";
+$sql_check_uname = "SELECT * FROM attendee WHERE username = '$uname' UNION SELECT * FROM organizer WHERE username = '$uname' UNION SELECT * FROM admin WHERE username = '$uname'";
 $result_uname = queryDB($sql_check_uname);
 if ($result_uname->num_rows > 0) {
     echo "Username already exists. Please choose a different username!";
@@ -64,7 +69,7 @@ if ($role == "Attendee") {
     $sql = "INSERT INTO organizer (name, username, email, password, securityQ, securityA) 
             VALUES ('$name', '$uname', '$email', '$hashed_password', '$security_question', '$security_answer')";
 } elseif ($role == "Admin") {
-    $sql = "INSERT INTO organizer (name, username, email, password, securityQ, securityA) 
+    $sql = "INSERT INTO admin (name, username, email, password, securityQ, securityA) 
             VALUES ('$name', '$uname', '$email', '$hashed_password', '$security_question', '$security_answer')";
 }else {
     echo "Invalid role selected, please go back and pick a role!";
@@ -75,10 +80,10 @@ if ($role == "Attendee") {
         </script>";
     exit;
 }
-echo modifyDB($sql) . "<br>Redirecting you to the Log In Page!";
+echo modifyDB($sql) . "<br>Redirecting you back to the Admin Dashboard!";
 echo "<script>
     setTimeout(function() {
-    window.location.href = 'LogInPage.php';
+    window.location.href = 'welcome_admin.php';
     }, 5000);
     </script>";
 echo "</div>";
