@@ -2,6 +2,11 @@
 session_start();
 include('DBConnect.php');
 
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
+    header('Location: index.php');
+    exit();
+}
+
 // Query to fetch the events
 $sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address, event.description, event.categoryID, organizer.Name AS organizerName 
         FROM event 
@@ -88,7 +93,7 @@ $result = queryDB($sql);
                                 break;
                         }
 
-                        $isAttendee = isset($_SESSION['role']) && $_SESSION['role'] == 'attendee';
+                        $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] == 'admin';
 
                         echo "<tr>
                             <td><strong>{$row['eventName']}</strong><br><small class='text-muted'>by {$row['organizerName']}</small></td>
@@ -98,12 +103,12 @@ $result = queryDB($sql);
                             <td>{$category}</td>
                             <td>";
 
-                        if ($isAttendee) {
-                            echo "<form action='signup_event.php' method='POST'>
-                                <input type='hidden' name='eventID' value='{$row['eventID']}'>
-                                <button type='submit' class='btn btn-success'>Sign Up</button>
-                              </form>";
-                        } else {
+                        if ($isAdmin) {
+                            echo "<form action='admin_events_action.php' method='POST'>"
+                            . "<input type='hidden' name='eventID' value='" . htmlspecialchars($row['eventID']) . "'>
+                                <button type='submit' class='btn btn-danger' onclick=\"return confirm('Are you sure you want to delete this event?');\">Remove</button>
+                                </form>";
+        } else {
                             echo "<button class='btn btn-secondary' disabled data-bs-toggle='tooltip' data-bs-placement='top'>Register to sign up!</button>";
                         }
 
