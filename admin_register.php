@@ -14,6 +14,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="registration.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
