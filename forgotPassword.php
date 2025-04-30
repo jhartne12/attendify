@@ -1,49 +1,71 @@
 <?php
-session_start();
-include("DBConnect.php");
+require_once 'DBConnect.php';
 
-openDB();
-global $conn;
+if ($_SERVER['REQUEST_METHOD'] == 'POST') {
+    $email = htmlspecialchars(trim($_POST['email']));
+    $newPassword = htmlspecialchars(trim($_POST['newPassword']));
+    $role = htmlspecialchars(trim($_POST['role']));
 
-if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $email = trim($_POST["email"]);
-    $tables = ["attendee", "organizer", "admin"];
-    $found = false;
-
-    foreach ($tables as $table) {
-        $stmt = $conn->prepare("SELECT email FROM $table WHERE email = ?");
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-
-        if ($result && $result->num_rows > 0) {
-            // Simulate a reset link with role info in the URL
-            $reset_link = "resetPassword.php?email=" . urlencode($email) . "&role=" . $table;
-            echo "Password reset link: <a href='$reset_link'>$reset_link</a>";
-            $found = true;
-            break;
-        }
+    if (empty($email) || empty($newPassword) || empty($role)) {
+        echo "All fields are required.";
+        exit();
     }
 
-    if (!$found) {
-        echo "Email not found in any user table.";
+    $conn = openDB();
+
+    if ($role == "attendee") {
+        $table = "attendee";
+    } elseif ($role == "organizer") {
+        $table = "organizer";
+    } elseif ($role == "admin") {
+        $table = "admin";
+    } else {
+        echo "Invalid role selected.";
+        exit();
     }
 
-    closeDB();
+    // Hash the new password
+    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
+
+    // Update password
+    $stmt = $conn->prepare("UPDATE $table SET password = ? WHERE email = ?");
+    $stmt->bind_param("ss", $hashedPassword, $email);
+
+    if ($stmt->execute()) {
+        echo "Password reset successfully! <a href='LogInPage.php'>Login here</a>.";
+    } else {
+        echo "Error resetting password: " . $stmt->error;
+    }
+
+    $stmt->close();
+    $conn->close();
 }
 ?>
 
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Forgot Password - Attendify</title>
+    <meta charset="UTF-8">
+    <title>Reset Password</title>
 </head>
 <body>
-  <h2>Forgot Password</h2>
-  <form method="post">
-    <label>Email:</label>
-    <input type="email" name="email" required>
-    <input type="submit" value="Send Reset Link">
-  </form>
+    <h2 style="text-align:center;">Reset Password</h2>
+    <form method="POST" action="resetPassword.php" style="width:300px;margin:auto;">
+        <label for="email">Email:</label><br>
+        <input type="email" id="email" name="email" required><br><br>
+
+        <label for="newPassword">New Password:</label><br>
+        <input type="password" id="newPassword" name="newPassword" required><br><br>
+
+        <label for="role">Select Role:</label><br>
+        <select id="role" name="role" required>
+            <option value="">--Select--</option>
+            <option value="attendee">Attendee</option>
+            <option value="organizer">Organizer</option>
+            <option value="admin">Admin</option>
+        </select><br><br>
+
+        <input type="submit" value="Reset Password">
+    </form>
 </body>
 </html>
