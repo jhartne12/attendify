@@ -104,7 +104,7 @@ $result = queryDB($sql);
                             <td>";
 
                         if ($isAdmin) {
-                            echo "<form action='signup_event.php' method='POST'>
+                            echo "<form action='admin_events_action.php' method='POST'>
                                 <input type='hidden' name='eventID' value='{$row['eventID']}'>
                                 <button type='submit' class='btn btn-danger'>Remove</button>
                               </form>";
