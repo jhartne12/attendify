@@ -1,71 +1,122 @@
 <?php
-require_once 'DBConnect.php';
+session_start();
+include("DBConnect.php");
 
-if ($_SERVER['REQUEST_METHOD'] == 'POST') {
-    $email = htmlspecialchars(trim($_POST['email']));
-    $newPassword = htmlspecialchars(trim($_POST['newPassword']));
-    $role = htmlspecialchars(trim($_POST['role']));
+openDB();
+global $conn;
 
-    if (empty($email) || empty($newPassword) || empty($role)) {
-        echo "All fields are required.";
-        exit();
-    }
+$step = 1;
+$error = "";
+$securityQ = "";
+$email = $role = "";
 
-    $conn = openDB();
+if ($_SERVER["REQUEST_METHOD"] == "POST") {
+    $email = trim($_POST["email"]);
+    $role = trim($_POST["role"]);
 
-    if ($role == "attendee") {
-        $table = "attendee";
-    } elseif ($role == "organizer") {
-        $table = "organizer";
-    } elseif ($role == "admin") {
-        $table = "admin";
+    $allowed_roles = ["attendee", "organizer", "admin"];
+    if (!in_array($role, $allowed_roles)) {
+        $error = "Invalid role selected.";
     } else {
-        echo "Invalid role selected.";
-        exit();
+        if (isset($_POST["step"]) && $_POST["step"] == "1") {
+            // Step 1: Get security question
+            $stmt = $conn->prepare("SELECT securityQ FROM $role WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->bind_result($securityQ);
+            if ($stmt->fetch()) {
+                $step = 2;
+            } else {
+                $error = "No user found with that email.";
+            }
+            $stmt->close();
+        }
+
+        elseif (isset($_POST["step"]) && $_POST["step"] == "2") {
+            // Step 2: Check security answer and reset password
+            $securityA = trim($_POST["securityA"]);
+            $newPassword = $_POST["newPassword"];
+
+            $stmt = $conn->prepare("SELECT securityA FROM $role WHERE email = ?");
+            $stmt->bind_param("s", $email);
+            $stmt->execute();
+            $stmt->bind_result($storedA);
+            if ($stmt->fetch()) {
+                if (strtolower(trim($storedA)) === strtolower(trim($securityA))) {
+                    $stmt->close();
+                    $hashed = password_hash($newPassword, PASSWORD_DEFAULT);
+                    $update = $conn->prepare("UPDATE $role SET password = ? WHERE email = ?");
+                    $update->bind_param("ss", $hashed, $email);
+                    if ($update->execute()) {
+                        echo "<p style='text-align:center; color:green;'>Password reset successful. <a href='LogInPage.php'>Login here</a>.</p>";
+                        closeDB();
+                        exit();
+                    } else {
+                        $error = "Failed to update password.";
+                    }
+                    $update->close();
+                } else {
+                    $error = "Incorrect security answer.";
+                }
+            } else {
+                $error = "User not found.";
+            }
+            $stmt->close();
+        }
     }
-
-    // Hash the new password
-    $hashedPassword = password_hash($newPassword, PASSWORD_DEFAULT);
-
-    // Update password
-    $stmt = $conn->prepare("UPDATE $table SET password = ? WHERE email = ?");
-    $stmt->bind_param("ss", $hashedPassword, $email);
-
-    if ($stmt->execute()) {
-        echo "Password reset successfully! <a href='LogInPage.php'>Login here</a>.";
-    } else {
-        echo "Error resetting password: " . $stmt->error;
-    }
-
-    $stmt->close();
-    $conn->close();
 }
+
+closeDB();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Reset Password</title>
+    <title>Forgot Password</title>
 </head>
 <body>
-    <h2 style="text-align:center;">Reset Password</h2>
-    <form method="POST" action="resetPassword.php" style="width:300px;margin:auto;">
-        <label for="email">Email:</label><br>
-        <input type="email" id="email" name="email" required><br><br>
+    <h2 style="text-align:center;">Forgot Password</h2>
+    <?php if ($error): ?>
+        <p style="text-align:center; color:red;"><?php echo $error; ?></p>
+    <?php endif; ?>
 
-        <label for="newPassword">New Password:</label><br>
-        <input type="password" id="newPassword" name="newPassword" required><br><br>
+    <?php if ($step === 1): ?>
+        <form method="POST" style="width:300px; margin:auto;">
+            <input type="hidden" name="step" value="1">
+            <label>Email:</label><br>
+            <input type="email" name="email" required><br><br>
 
-        <label for="role">Select Role:</label><br>
-        <select id="role" name="role" required>
-            <option value="">--Select--</option>
-            <option value="attendee">Attendee</option>
-            <option value="organizer">Organizer</option>
-            <option value="admin">Admin</option>
-        </select><br><br>
+            <label>Role:</label><br>
+            <select name="role" required>
+                <option value="">--Select--</option>
+                <option value="attendee">Attendee</option>
+                <option value="organizer">Organizer</option>
+                <option value="admin">Admin</option>
+            </select><br><br>
 
-        <input type="submit" value="Reset Password">
-    </form>
+            <input type="submit" value="Next">
+        </form>
+
+    <?php elseif ($step === 2): ?>
+        <form method="POST" style="width:300px; margin:auto;">
+            <input type="hidden" name="step" value="2">
+            <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
+            <input type="hidden" name="role" value="<?php echo htmlspecialchars($role); ?>">
+
+            <label>Security Question:</label><br>
+            <input type="text" value="<?php echo htmlspecialchars($securityQ); ?>" disabled><br><br>
+
+            <label>Your Answer:</label><br>
+            <input type="text" name="securityA" required><br><br>
+
+            <label>New Password:</label><br>
+            <input type="password" name="newPassword" required><br><br>
+
+            <input type="submit" value="Reset Password">
+        </form>
+    <?php endif; ?>
 </body>
 </html>
+
