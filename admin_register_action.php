@@ -34,7 +34,7 @@ if (strlen($passwd) < 8) {
 
 // checks if password not typed in correctly
 if ($passwd !== $passwd2) {
-    echo "Passwords do not match. Please go back and re-enter your passwords!";
+    echo "Passwords do not match. Please go back and re-enter the user's passwords!";
     echo "<br><br>Redirecting back after 5 seconds.";
     echo "<script>
         setTimeout(function() {
@@ -80,7 +80,7 @@ if ($role == "Attendee") {
         </script>";
     exit;
 }
-echo modifyDB($sql) . "<br>Redirecting you back to the Admin Dashboard!";
+echo modifyDB($sql) . "<br>User created! Redirecting you back to the Admin Dashboard.";
 echo "<script>
     setTimeout(function() {
     window.location.href = 'welcome_admin.php';
