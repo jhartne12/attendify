@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eventID'])) {
     closeDB();
 
     echo "<div style='text-align:center; margin-top:20px;'>
-            <a href='index.php'>Back to Event List</a>
+            <a href='admin_events.php'>Back to Event List</a>
           </div>";
 } else {
     echo "<p style='text-align:center; color:red;'>Invalid request.</p>";

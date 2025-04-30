@@ -104,11 +104,11 @@ $result = queryDB($sql);
                             <td>";
 
                         if ($isAdmin) {
-                            echo "<form action='admin_events_action.php' method='POST'>
-                                <input type='hidden' name='eventID' value='{$row['eventID']}'>
-                                <button type='submit' class='btn btn-danger'>Remove</button>
-                              </form>";
-                        } else {
+                            echo "<form action='admin_events_action.php' method='POST'>"
+                            . "<input type='hidden' name='eventID' value='" . htmlspecialchars($row['eventID']) . "'>
+                                <button type='submit' class='btn btn-danger' onclick=\"return confirm('Are you sure you want to delete this event?');\">Remove</button>
+                                </form>";
+        } else {
                             echo "<button class='btn btn-secondary' disabled data-bs-toggle='tooltip' data-bs-placement='top'>Register to sign up!</button>";
                         }
 
