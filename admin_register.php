@@ -25,13 +25,10 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="admin_register.php">Create User</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="admin_events.php">Manage Events</a>
                         </li>
                     </ul>
                     <?php if (isset($_SESSION['username'])): ?>
