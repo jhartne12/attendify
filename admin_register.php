@@ -14,6 +14,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="registration.css" rel="stylesheet" type="text/css">
+        <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
@@ -25,13 +26,10 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="admin_register.php">Create User</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="admin_events.php">Manage Events</a>
                         </li>
                     </ul>
                     <?php if (isset($_SESSION['username'])): ?>

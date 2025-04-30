@@ -35,10 +35,12 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
                         <a class="nav-link" href="admin_events.php">Manage Events</a>
                     </li>
                 </ul>
-                <span class="navbar-text text-white me-3">
-                    Welcome Admin, <?php echo htmlspecialchars($_SESSION['username']); ?>
-                </span>
-                <a href="logout.php" class="btn btn-danger">Logout</a>
+                <?php if (isset($_SESSION['username'])): ?>
+                    <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
+                    <a href="logout.php" class="btn btn-danger ms-2">Logout</a>
+                <?php else: ?>
+                    <a href="LogInPage.php" class="btn btn-primary">Login</a>
+                <?php endif; ?>
             </div>
         </div>
     </nav>
