@@ -4,56 +4,89 @@ include("DBConnect.php");
 openDB();
 global $conn;
 
-if (!isset($_SESSION['email']) || $_SESSION['role'] != 'attendee') {
-    exit("Unauthorized access.");
+// Verify session
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'attendee') {
+    header('Location: index.php');
+    exit();
 }
 
-$email = $_SESSION['email'];
+$email = $_SESSION['username'];
 
-// Handle event registration
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['event_id'])) {
-    $event_id = intval($_POST['event_id']);
-    $check_sql = "SELECT * FROM event_registrations WHERE attendee_email = '$email' AND event_id = $event_id";
-    $result = $conn->query($check_sql);
+// fetch attendeeID based on the logged-in email
+$attendee_stmt = $conn->prepare("SELECT attendeeID FROM attendee WHERE email = ?");
+$attendee_stmt->bind_param("s", $email);
+$attendee_stmt->execute();
+$attendee_result = $attendee_stmt->get_result();
 
-    if ($result->num_rows == 0) {
-        $insert_sql = "INSERT INTO event_registrations (attendee_email, event_id) VALUES ('$email', $event_id)";
-        $conn->query($insert_sql);
-        echo "<p style='color:green;'>Successfully registered for event #$event_id</p>";
+if ($attendee_result->num_rows == 0) {
+    echo "<p style='color:red;'>Attendee not found.</p>";
+    exit();
+}
+
+$attendee_row = $attendee_result->fetch_assoc();
+$attendeeID = $attendee_row['attendeeID'];
+
+$attendee_stmt->close();
+
+// handle event unregistration
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['eventID'])) {
+    $event_id = intval($_POST['eventID']);
+
+    // Remove the attendee from the event using the attendeeID
+    $delete_stmt = $conn->prepare("DELETE FROM event_attendee WHERE attendeeID = ? AND eventID = ?");
+    $delete_stmt->bind_param("ii", $attendeeID, $event_id);
+
+    if ($delete_stmt->execute()) {
+        echo "<p style='color:green;'>Successfully unregistered from event #$event_id</p>";
     } else {
-        echo "<p style='color:orange;'>You are already registered for this event.</p>";
+        echo "<p style='color:red;'>Error unregistering: " . htmlspecialchars($delete_stmt->error) . "</p>";
     }
+
+    $delete_stmt->close();
 }
 
-// Fetch all events
-$events_result = $conn->query("SELECT * FROM event");
+// fetch events the attendee has registered for
+$events_stmt = $conn->prepare("SELECT event.eventID, event.Name AS eventName, event.date, event.description, event.categoryID, organizer.Name AS organizerName 
+                               FROM event
+                               JOIN event_attendee ON event.eventID = event_attendee.eventID
+                               JOIN organizer ON event.organizerID = organizer.organizerID
+                               WHERE event_attendee.attendeeID = ?");
+$events_stmt->bind_param("i", $attendeeID);
+$events_stmt->execute();
+$events_result = $events_stmt->get_result();
+
 ?>
 
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome Attendee</title>
+    <title>Registered Events</title>
 </head>
 <body>
-    <h2>Welcome, <?php echo $_SESSION['email']; ?> (Attendee)</h2>
+    <h2>Welcome, <?php echo htmlspecialchars($_SESSION['username']); ?> (Attendee)</h2>
     <p>You have access to attendee features.</p>
-    <h3>Available Events</h3>
+
+    <h3>Your Registered Events</h3>
     <table border="1" cellpadding="5">
-        <tr><th>Event ID</th><th>Title</th><th>Description</th><th>Action</th></tr>
+        <tr><th>Event Name</th><th>Date</th><th>Organizer</th><th>Description</th><th>Action</th></tr>
+
         <?php while ($event = $events_result->fetch_assoc()): ?>
             <tr>
-                <td><?php echo $event['event_id']; ?></td>
-                <td><?php echo $event['title']; ?></td>
-                <td><?php echo $event['description']; ?></td>
+                <td><strong><?php echo htmlspecialchars($event['eventName']); ?></strong></td>
+                <td><?php echo htmlspecialchars($event['date']); ?></td>
+                <td><?php echo htmlspecialchars($event['organizerName']); ?></td>
+                <td><?php echo htmlspecialchars($event['description']); ?></td>
                 <td>
                     <form method="post">
-                        <input type="hidden" name="event_id" value="<?php echo $event['event_id']; ?>">
-                        <input type="submit" value="Register">
+                        <input type="hidden" name="eventID" value="<?php echo $event['eventID']; ?>">
+                        <input type="submit" value="Unregister">
                     </form>
                 </td>
             </tr>
         <?php endwhile; ?>
+
     </table>
+    <br><a href="index.php">Register For an event!</a>
     <br><a href="logout.php">Logout</a>
 </body>
 </html>
