@@ -8,7 +8,6 @@ $dbname = "attendify";
 $conn;
 
 
-
 // Internal APIs 
 function openDB() {
   global $servername, $username, $password, $dbname, $conn;

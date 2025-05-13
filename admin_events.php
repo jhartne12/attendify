@@ -2,6 +2,11 @@
 session_start();
 include('DBConnect.php');
 
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
+    header('Location: index.php');
+    exit();
+}
+
 // Query to fetch the events
 $sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address, event.description, event.categoryID, organizer.Name AS organizerName 
         FROM event 
@@ -26,19 +31,16 @@ $result = queryDB($sql);
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="mynavbar">
+            <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
+                        <a class="nav-link" href="admin_register.php">Create User</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
+                        <a class="nav-link" href="admin_events.php">Manage Events</a>
                     </li>
                 </ul>
                 <?php if (isset($_SESSION['username'])): ?>
@@ -52,7 +54,7 @@ $result = queryDB($sql);
     </nav>
 
     <div class="container-fluid d-flex flex-column align-items-center" style="margin-top:10px">
-        <h3 style="font-size:50px" class="text-center">Welcome to Attendify</h3>
+        <h3 style="font-size:50px" class="text-center">Admin Event List</h3>
         <br>
         <h4 class="text-center">Available Events</h4>
         <table class="table table-bordered w-75">
@@ -88,7 +90,7 @@ $result = queryDB($sql);
                                 break;
                         }
 
-                        $isAttendee = isset($_SESSION['role']) && $_SESSION['role'] == 'attendee';
+                        $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] == 'admin';
 
                         echo "<tr>
                             <td><strong>{$row['eventName']}</strong><br><small class='text-muted'>by {$row['organizerName']}</small></td>
@@ -98,12 +100,12 @@ $result = queryDB($sql);
                             <td>{$category}</td>
                             <td>";
 
-                        if ($isAttendee) {
-                            echo "<form action='signup_event.php' method='POST'>
-                                <input type='hidden' name='eventID' value='{$row['eventID']}'>
-                                <button type='submit' class='btn btn-success'>Sign Up</button>
-                              </form>";
-                        } else {
+                        if ($isAdmin) {
+                            echo "<form action='admin_events_action.php' method='POST'>"
+                            . "<input type='hidden' name='eventID' value='" . htmlspecialchars($row['eventID']) . "'>
+                                <button type='submit' class='btn btn-danger' onclick=\"return confirm('Are you sure you want to delete this event?');\">Remove</button>
+                                </form>";
+        } else {
                             echo "<button class='btn btn-secondary' disabled data-bs-toggle='tooltip' data-bs-placement='top'>Register to sign up!</button>";
                         }
 
