@@ -86,6 +86,9 @@ $events_result = $events_stmt->get_result();
         <?php endwhile; ?>
 
     </table>
+
+    <br><a href="ProfileInfo.php">Want edit your profile?</a>
+
     <br><a href="index.php">Register For an event!</a>
     <br><a href="logout.php">Logout</a>
 </body>

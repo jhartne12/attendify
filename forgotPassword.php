@@ -46,6 +46,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 if (strtolower(trim($storedA)) === strtolower(trim($securityA))) {
                     $stmt->close();
 
+
+
                     if (strlen($newPassword) < 8) {
                         $error = "Password must be at least 8 characters long.";
                     } else {

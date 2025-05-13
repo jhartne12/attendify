@@ -20,6 +20,8 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
 </head>
 
 <body>
+
+
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
@@ -53,5 +55,6 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
             <a href="admin_events.php" class="btn btn-danger btn-lg">Manage Events</a>
         </div>
     </div>
+
 </body>
 </html>
