@@ -1,13 +1,19 @@
+<?php
+session_start();
+if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
+    header('Location: index.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>Event Creation</title>
+        <title>Registration</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
         <link href="registration.css" rel="stylesheet" type="text/css">
-        <link href="registraion_action.php" rel="action page" type="text/php">
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
@@ -20,13 +26,10 @@
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav me-auto">
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="admin_register.php">Create User</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="admin_events.php">Manage Events</a>
                         </li>
                     </ul>
                     <?php if (isset($_SESSION['username'])): ?>
@@ -40,7 +43,7 @@
         </nav>
 
         <div class="registration-container">
-            <form action="registration_action.php" method="POST">
+            <form action="admin_register_action.php" method="POST">
                 <table class="table registration-table table-bordered">
                     <thead>
                         <tr>
@@ -55,6 +58,7 @@
                                     <option value="" disabled selected>Select your role</option>
                                     <option value="Attendee">Attendee</option>
                                     <option value="Organizer">Organizer</option>
+                                    <option value="Admin">Admin</option>
                                 </select>
                             </td>
                         </tr>

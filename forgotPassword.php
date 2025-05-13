@@ -37,6 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $securityA = trim($_POST["securityA"]);
             $newPassword = $_POST["newPassword"];
 
+
             $stmt = $conn->prepare("SELECT securityA FROM $role WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
@@ -44,6 +45,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             if ($stmt->fetch()) {
                 if (strtolower(trim($storedA)) === strtolower(trim($securityA))) {
                     $stmt->close();
+
+
 
                     if (strlen($newPassword) < 8) {
                         $error = "Password must be at least 8 characters long.";
@@ -61,6 +64,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $update->close();
                     }
 
+
                 } else {
                     $error = "Incorrect security answer.";
                 }
@@ -74,6 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 closeDB();
 ?>
+
 
 <!DOCTYPE html>
 <html lang="en">
@@ -117,6 +122,7 @@ closeDB();
             <input type="text" name="securityA" required><br><br>
 
             <label>New Password:</label><br>
+
             <input type="password" name="newPassword" minlength="8" required><br>
             <small>Password must be at least 8 characters long.</small><br><br>
 
@@ -125,3 +131,4 @@ closeDB();
     <?php endif; ?>
 </body>
 </html>
+
