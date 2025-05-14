@@ -1,3 +1,12 @@
+<?php
+session_start();
+
+if (isset($_SESSION['username']) && isset($_SESSION['role'])) {
+    header("Location: welcome_" . $_SESSION['role'] . ".php");
+    exit();
+}
+?>
+
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -6,28 +15,17 @@
         <title>Event Creation</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <link href="registration.css" rel="stylesheet" type="text/css">
-        <link href="registraion_action.php" rel="action page" type="text/php">
         <link rel="stylesheet" type="text/css" href="style.css">
     </head>
     <body>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
             <div class="container-fluid">
-                <a class="navbar-brand" href="javascript:void(0)">Attendify</a>
+                <a class="navbar-brand" href="index.php">Attendify</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
                     </ul>
                     <?php if (isset($_SESSION['username'])): ?>
                         <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>

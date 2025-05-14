@@ -2,6 +2,7 @@
 session_start();
 include('DBConnect.php');
 
+// check if user is logged in and is an organizer
 if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
     header('Location: index.php');
     exit();
@@ -15,9 +16,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
         <title>Registration</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <link href="registration.css" rel="stylesheet" type="text/css">
-        <link href="registraion_action.php" rel="action page" type="text/php">
-        
+        <link href="style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
@@ -28,14 +27,20 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
                 </button>
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
+                                Notifications
+                                <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
+                            </a>
+                            <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
+                                <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
+                            </ul>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="event.php">Create Event</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="profileinfo.php">Edit Profile</a>
                         </li>
                     </ul>
                     <?php if (isset($_SESSION['username'])): ?>
@@ -47,6 +52,55 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
                 </div>
             </div>
         </nav>
+        <script>
+            fetch('fetch_notifications.php')
+                .then(response => response.json())
+                .then(data => {
+                    const notificationList = document.getElementById('notificationList');
+                    const notificationBadge = document.getElementById('notificationBadge');
+                    notificationList.innerHTML = '';
+
+                    if (data.length > 0) {
+                        notificationBadge.textContent = data.length;
+                        notificationBadge.style.display = 'inline-block';
+                        data.forEach(notification => {
+                            const li = document.createElement('li');
+                            li.innerHTML = `<a class="dropdown-item" href="#">${notification}</a>`;
+                            notificationList.appendChild(li);
+                        });
+                    } else {
+                        notificationBadge.style.display = 'none';
+                        const li = document.createElement('li');
+                        li.innerHTML = '<a class="dropdown-item text-muted" href="#">No new notifications</a>';
+                        notificationList.appendChild(li);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error fetching notifications:', error);
+                });
+
+            function markAllAsRead() {
+                fetch('update_notification.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: 'markAll=true'
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        console.log('All notifications marked as read');
+                        document.getElementById('notificationBadge').style.display = 'none';
+                    } else {
+                        console.error('Failed to mark notifications as read:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                });
+            }
+        </script>
 
         <div class="registration-container">
             <form action="event_action.php" method="POST">
