@@ -41,7 +41,7 @@ session_start();
         </nav>
 
         <div class="registration-container">
-            <form action="admin_register_action.php" method="POST">
+            <form action="admin_register_action_debug.php" method="POST">
                 <table class="table registration-table table-bordered">
                     <thead>
                         <tr>
