@@ -1,42 +1,6 @@
 <?php
 session_start();
 include 'DBConnect.php';
-
-// fetch unread notifications for the attendee
-$notifications = [];
-if (isset($_SESSION['username']) && $_SESSION['role'] === 'attendee') {
-    $connMessage = openDB();
-    global $conn;
-
-    if ($connMessage === "Connected") {
-        $stmt = $conn->prepare("SELECT attendeeID FROM attendee WHERE email = ?");
-        $stmt->bind_param("s", $_SESSION['username']);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        $attendeeID = $result->fetch_assoc()['attendeeID'];
-        $stmt->close();
-
-        $notification_stmt = $conn->prepare("
-            SELECT message 
-            FROM notifications 
-            WHERE attendeeID = ? AND isRead = 0 
-            ORDER BY created_at DESC
-        ");
-        $notification_stmt->bind_param("i", $attendeeID);
-        $notification_stmt->execute();
-        $notification_result = $notification_stmt->get_result();
-        while ($row = $notification_result->fetch_assoc()) {
-            $notifications[] = $row['message'];
-        }
-        $notification_stmt->close();
-
-        // mark notifications as read
-        $mark_read_stmt = $conn->prepare("UPDATE notifications SET isRead = 1 WHERE attendeeID = ?");
-        $mark_read_stmt->bind_param("i", $attendeeID);
-        $mark_read_stmt->execute();
-        $mark_read_stmt->close();
-    }
-}
 ?>
 <!DOCTYPE html>
 <html>
@@ -60,18 +24,15 @@ if (isset($_SESSION['username']) && $_SESSION['role'] === 'attendee') {
             </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <?php if (!empty($notifications)): ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Notifications
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
-                                <?php foreach ($notifications as $notification): ?>
-                                    <li><a class="dropdown-item" href="#"><?php echo htmlspecialchars($notification); ?></a></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </li>
-                    <?php endif; ?>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
+                            Notifications
+                            <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
+                        </a>
+                        <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
+                            <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
+                        </ul>
+                    </li>
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Event Register</a>
                     </li>
@@ -88,6 +49,55 @@ if (isset($_SESSION['username']) && $_SESSION['role'] === 'attendee') {
             </div>
         </div>
     </nav>
+    <script>
+        fetch('fetch_notifications.php')
+            .then(response => response.json())
+            .then(data => {
+                const notificationList = document.getElementById('notificationList');
+                const notificationBadge = document.getElementById('notificationBadge');
+                notificationList.innerHTML = '';
+
+                if (data.length > 0) {
+                    notificationBadge.textContent = data.length;
+                    notificationBadge.style.display = 'inline-block';
+                    data.forEach(notification => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a class="dropdown-item" href="#">${notification}</a>`;
+                        notificationList.appendChild(li);
+                    });
+                } else {
+                    notificationBadge.style.display = 'none';
+                    const li = document.createElement('li');
+                    li.innerHTML = '<a class="dropdown-item text-muted" href="#">No new notifications</a>';
+                    notificationList.appendChild(li);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching notifications:', error);
+            });
+
+        function markAllAsRead() {
+            fetch('update_notification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'markAll=true'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('All notifications marked as read');
+                    document.getElementById('notificationBadge').style.display = 'none';
+                } else {
+                    console.error('Failed to mark notifications as read:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {

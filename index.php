@@ -1,6 +1,13 @@
 <?php
 session_start();
 include('DBConnect.php');
+global $conn;
+
+// ensure the database connection is open
+$connMessage = openDB();
+if ($connMessage !== "Connected") {
+    die("Database connection failed: " . htmlspecialchars($connMessage));
+}
 
 // query to fetch the events
 $sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address, event.description, event.categoryID, organizer.Name AS organizerName 
@@ -8,59 +15,8 @@ $sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address
         JOIN organizer ON event.organizerID = organizer.organizerID";
 
 $result = queryDB($sql);
-
-// fetch unread notifications for the logged-in user
-$notifications = [];
-if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
-    $email = $_SESSION['username'];
-    $role = $_SESSION['role'];
-
-    if ($role === 'attendee') {
-        $stmt = $conn->prepare("
-            SELECT message 
-            FROM notifications 
-            WHERE attendeeID = (SELECT attendeeID FROM attendee WHERE email = ?) AND isRead = 0 
-            ORDER BY created_at DESC
-        ");
-    } elseif ($role === 'organizer') {
-        $stmt = $conn->prepare("
-            SELECT message 
-            FROM notifications 
-            WHERE organizerID = (SELECT organizerID FROM organizer WHERE email = ?) AND isRead = 0 
-            ORDER BY created_at DESC
-        ");
-    }
-
-    if (isset($stmt)) {
-        $stmt->bind_param("s", $email);
-        $stmt->execute();
-        $result = $stmt->get_result();
-        while ($row = $result->fetch_assoc()) {
-            $notifications[] = $row['message'];
-        }
-        $stmt->close();
-
-        // mark notifications as read
-        if ($role === 'attendee') {
-            $mark_read_stmt = $conn->prepare("
-                UPDATE notifications 
-                SET isRead = 1 
-                WHERE attendeeID = (SELECT attendeeID FROM attendee WHERE email = ?)
-            ");
-        } elseif ($role === 'organizer') {
-            $mark_read_stmt = $conn->prepare("
-                UPDATE notifications 
-                SET isRead = 1 
-                WHERE organizerID = (SELECT organizerID FROM organizer WHERE email = ?)
-            ");
-        }
-
-        if (isset($mark_read_stmt)) {
-            $mark_read_stmt->bind_param("s", $email);
-            $mark_read_stmt->execute();
-            $mark_read_stmt->close();
-        }
-    }
+if (gettype($result) !== "object") {
+    die("Error fetching events: " . htmlspecialchars($result));
 }
 ?>
 
@@ -80,23 +36,17 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <?php if (!empty($notifications)): ?>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                Notifications
-                            </a>
-                            <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
-                                <?php foreach ($notifications as $notification): ?>
-                                    <li><a class="dropdown-item" href="#"><?php echo htmlspecialchars($notification); ?></a></li>
-                                <?php endforeach; ?>
-                            </ul>
-                        </li>
-                    <?php endif; ?>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
+                            Notifications
+                            <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
+                        </a>
+                        <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
+                            <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
+                        </ul>
+                    </li>
                 </ul>
                 <?php if (isset($_SESSION['username'])): ?>
                     <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
@@ -179,6 +129,75 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
         var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
             return new bootstrap.Tooltip(tooltipTriggerEl);
         });
+        
+        fetch('fetch_notifications.php')
+            .then(response => response.json())
+            .then(data => {
+                const notificationList = document.getElementById('notificationList');
+                const notificationBadge = document.getElementById('notificationBadge');
+                notificationList.innerHTML = '';
+
+                if (data.length > 0) {
+                    notificationBadge.textContent = data.length;
+                    notificationBadge.style.display = 'inline-block';
+                    data.forEach((notification, index) => {
+                        const li = document.createElement('li');
+                        li.innerHTML = `<a class="dropdown-item" href="#" onclick="markAsRead(${index})">${notification}</a>`;
+                        notificationList.appendChild(li);
+                    });
+                } else {
+                    notificationBadge.style.display = 'none';
+                    const li = document.createElement('li');
+                    li.innerHTML = '<a class="dropdown-item text-muted" href="#">No new notifications</a>';
+                    notificationList.appendChild(li);
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching notifications:', error);
+            });
+
+        function markAsRead(notificationID) {
+            fetch('update_notification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `notificationID=${notificationID}`
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('Notification marked as read');
+                } else {
+                    console.error('Failed to mark notification as read:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        function markAllAsRead() {
+            fetch('update_notification.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: 'markAll=true'
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    console.log('All notifications marked as read');
+                    document.getElementById('notificationBadge').style.display = 'none';
+                } else {
+                    console.error('Failed to mark notifications as read:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 
 </body>
