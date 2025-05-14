@@ -60,9 +60,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         $update = $conn->prepare("UPDATE $role SET password = ? WHERE email = ?");
                         $update->bind_param("ss", $hashed, $email);
                         if ($update->execute()) {
-                            echo "<p style='text-align:center; color:green;'>Password reset successful. <a href='LogInPage.php'>Login here</a>.</p>";
+                            $step = 3;
                             closeDB();
-                            exit();
                         } else {
                             $error = "Failed to update password.";
                         }
@@ -76,12 +75,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             } else {
                 $error = "User not found.";
             }
-            $stmt->close();
         }
     }
 }
-
-closeDB();
 ?>
 
 
@@ -117,49 +113,81 @@ closeDB();
             </div>
         </div>
     </nav>
-    
-    <h2 style="text-align:center;">Forgot Password</h2>
-    <?php if ($error): ?>
+
+    <?php if ($step === 3): ?>
+        <div class="container mt-5">
+            <div class="alert alert-success text-center">
+                <h4>Password Reset Successful!</h4>
+                <p>You can now <a href="LogInPage.php" class="btn btn-primary">Log In</a> with your new password.</p>
+            </div>
+        </div>
+    <?php endif; ?>
+
+        <div class="container mt-5">
+        <?php if ($error): ?>
         <p style="text-align:center; color:red;"><?php echo $error; ?></p>
-    <?php endif; ?>
+        <?php endif; ?>
 
-    <?php if ($step === 1): ?>
-        <form method="POST" style="width:300px; margin:auto;">
-            <input type="hidden" name="step" value="1">
-            <label>Email:</label><br>
-            <input type="email" name="email" required><br><br>
+        <?php if ($step === 1): ?>
+            <h2 class="text-center">Forgot Password</h2>
+            <form method="POST" class="mt-4">
+                <table class="table table-bordered w-50 mx-auto">
+                    <tbody>
+                        <input type="hidden" name="step" value="1">
+                        <tr>
+                            <td><label for="email" class="form-label">Email:</label></td>
+                            <td><input type="email" name="email" id="email" class="form-control" required></td>
+                        </tr>
+                        <tr>
+                            <td><label for="role" class="form-label">Role:</label></td>
+                            <td>
+                                <select name="role" id="role" class="form-select" required>
+                                    <option value="">--Select--</option>
+                                    <option value="attendee">Attendee</option>
+                                    <option value="organizer">Organizer</option>
+                                    <option value="admin">Admin</option>
+                                </select>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button type="submit" class="btn btn-primary">Next</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        <?php elseif ($step === 2): ?>
+            <h2 class="text-center">Forgot Password</h2>
+            <form method="POST" class="mt-4">
+                <table class="table table-bordered w-50 mx-auto">
+                    <tbody>
+                        <input type="hidden" name="step" value="2">
+                        <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
+                        <input type="hidden" name="role" value="<?php echo htmlspecialchars($role); ?>">
+                        <tr>
+                            <td><label for="securityQ" class="form-label">Security Question:</label></td>
+                            <td><input type="text" value="<?php echo htmlspecialchars($securityQ); ?>" class="form-control" disabled></td>
+                        </tr>
+                        <tr>
+                            <td><label for="securityA" class="form-label">Your Answer:</label></td>
+                            <td><input type="text" name="securityA" id="securityA" class="form-control" required></td>
+                        </tr>
+                        <tr>
+                            <td><label for="newPassword" class="form-label">New Password:</label></td>
+                            <td><input type="password" name="newPassword" id="newPassword" class="form-control" minlength="8" required></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" class="text-center">
+                                <button type="submit" class="btn btn-success">Reset Password</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </form>
+        <?php endif; ?>
+    </div>
 
-            <label>Role:</label><br>
-            <select name="role" required>
-                <option value="">--Select--</option>
-                <option value="attendee">Attendee</option>
-                <option value="organizer">Organizer</option>
-                <option value="admin">Admin</option>
-            </select><br><br>
-
-            <input type="submit" value="Next">
-        </form>
-
-    <?php elseif ($step === 2): ?>
-        <form method="POST" style="width:300px; margin:auto;">
-            <input type="hidden" name="step" value="2">
-            <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
-            <input type="hidden" name="role" value="<?php echo htmlspecialchars($role); ?>">
-
-            <label>Security Question:</label><br>
-            <input type="text" value="<?php echo htmlspecialchars($securityQ); ?>" disabled><br><br>
-
-            <label>Your Answer:</label><br>
-            <input type="text" name="securityA" required><br><br>
-
-            <label>New Password:</label><br>
-
-            <input type="password" name="newPassword" minlength="8" required><br>
-            <small>Password must be at least 8 characters long.</small><br><br>
-
-            <input type="submit" value="Reset Password">
-        </form>
-    <?php endif; ?>
 </body>
 </html>
 

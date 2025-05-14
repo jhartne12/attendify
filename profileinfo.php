@@ -75,9 +75,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     $stmt->bind_param($types, ...$params);
 
     if ($stmt->execute()) {
-        $message = "profile updated successfully.";
+        $message = "Profile updated successfully.";
     } else {
-        $message = "error updating profile.";
+        $message = "Error updating profile.";
     }
     $stmt->close();
 }
@@ -122,7 +122,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
     <div class="container mt-5">
         <h2 class="text-center">Edit my profile</h2>
 
-        <?php if (!empty($message)) echo "<div class='alert alert-danger'>$message</div>"; ?>
+        <?php if (!empty($message)) echo "<div class='alert alert-info text-center'>$message</div>"; ?>
 
         <form method="post" class="mt-4">
             <table class="table registration-table table-bordered">
