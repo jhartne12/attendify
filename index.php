@@ -2,12 +2,66 @@
 session_start();
 include('DBConnect.php');
 
-// Query to fetch the events
+// query to fetch the events
 $sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address, event.description, event.categoryID, organizer.Name AS organizerName 
         FROM event 
         JOIN organizer ON event.organizerID = organizer.organizerID";
 
 $result = queryDB($sql);
+
+// fetch unread notifications for the logged-in user
+$notifications = [];
+if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
+    $email = $_SESSION['username'];
+    $role = $_SESSION['role'];
+
+    if ($role === 'attendee') {
+        $stmt = $conn->prepare("
+            SELECT message 
+            FROM notifications 
+            WHERE attendeeID = (SELECT attendeeID FROM attendee WHERE email = ?) AND isRead = 0 
+            ORDER BY created_at DESC
+        ");
+    } elseif ($role === 'organizer') {
+        $stmt = $conn->prepare("
+            SELECT message 
+            FROM notifications 
+            WHERE organizerID = (SELECT organizerID FROM organizer WHERE email = ?) AND isRead = 0 
+            ORDER BY created_at DESC
+        ");
+    }
+
+    if (isset($stmt)) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $notifications[] = $row['message'];
+        }
+        $stmt->close();
+
+        // mark notifications as read
+        if ($role === 'attendee') {
+            $mark_read_stmt = $conn->prepare("
+                UPDATE notifications 
+                SET isRead = 1 
+                WHERE attendeeID = (SELECT attendeeID FROM attendee WHERE email = ?)
+            ");
+        } elseif ($role === 'organizer') {
+            $mark_read_stmt = $conn->prepare("
+                UPDATE notifications 
+                SET isRead = 1 
+                WHERE organizerID = (SELECT organizerID FROM organizer WHERE email = ?)
+            ");
+        }
+
+        if (isset($mark_read_stmt)) {
+            $mark_read_stmt->bind_param("s", $email);
+            $mark_read_stmt->execute();
+            $mark_read_stmt->close();
+        }
+    }
+}
 ?>
 
 <html lang="en">
@@ -31,15 +85,18 @@ $result = queryDB($sql);
             </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="javascript:void(0)">Link</a>
-                    </li>
+                    <?php if (!empty($notifications)): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Notifications
+                            </a>
+                            <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
+                                <?php foreach ($notifications as $notification): ?>
+                                    <li><a class="dropdown-item" href="#"><?php echo htmlspecialchars($notification); ?></a></li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
                 </ul>
                 <?php if (isset($_SESSION['username'])): ?>
                     <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
@@ -55,7 +112,7 @@ $result = queryDB($sql);
         <h3 style="font-size:50px" class="text-center">Welcome to Attendify</h3>
         <br>
         <h4 class="text-center">Available Events</h4>
-        <table class="table table-bordered w-75">
+        <table class="table registration-table table-bordered w-75">
             <thead>
                 <tr>
                     <th>Event Name</th>
