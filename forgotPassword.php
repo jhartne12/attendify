@@ -42,16 +42,13 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             $securityA = trim($_POST["securityA"]);
             $newPassword = $_POST["newPassword"];
 
-
             $stmt = $conn->prepare("SELECT securityA FROM $role WHERE email = ?");
             $stmt->bind_param("s", $email);
             $stmt->execute();
             $stmt->bind_result($storedA);
             if ($stmt->fetch()) {
-                if (strtolower(trim($storedA)) === strtolower(trim($securityA))) {
+                if (password_verify($securityA, $storedA)) {
                     $stmt->close();
-
-
 
                     if (strlen($newPassword) < 8) {
                         $error = "Password must be at least 8 characters long.";
@@ -67,8 +64,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                         }
                         $update->close();
                     }
-
-
                 } else {
                     $error = "Incorrect security answer.";
                 }
@@ -131,7 +126,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php if ($step === 1): ?>
             <h2 class="text-center">Forgot Password</h2>
             <form method="POST" class="mt-4">
-                <table class="table table-bordered w-50 mx-auto">
+                <table class="table registration-table table-bordered w-50 mx-auto">
                     <tbody>
                         <input type="hidden" name="step" value="1">
                         <tr>
@@ -160,7 +155,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <?php elseif ($step === 2): ?>
             <h2 class="text-center">Forgot Password</h2>
             <form method="POST" class="mt-4">
-                <table class="table table-bordered w-50 mx-auto">
+                <table class="table registration-table table-bordered w-50 mx-auto">
                     <tbody>
                         <input type="hidden" name="step" value="2">
                         <input type="hidden" name="email" value="<?php echo htmlspecialchars($email); ?>">
