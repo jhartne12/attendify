@@ -2,14 +2,14 @@
 session_start();
 include('DBConnect.php');
 
-// Query to fetch the events
+// query to fetch the events
 $sql = "SELECT event.eventID, event.Name AS eventName, event.date, event.address, event.description, event.categoryID, organizer.Name AS organizerName 
         FROM event 
         JOIN organizer ON event.organizerID = organizer.organizerID";
 
 $result = queryDB($sql);
 
-// Fetch unread notifications for the logged-in user
+// fetch unread notifications for the logged-in user
 $notifications = [];
 if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
     $email = $_SESSION['username'];
@@ -40,7 +40,7 @@ if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'
         }
         $stmt->close();
 
-        // Mark notifications as read
+        // mark notifications as read
         if ($role === 'attendee') {
             $mark_read_stmt = $conn->prepare("
                 UPDATE notifications 

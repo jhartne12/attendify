@@ -55,7 +55,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eventID'])) {
     global $conn;
 
     if ($connMessage !== "Connected") {
-        echo "<p style='text-align:center; color:red;'>database connection failed: " . htmlspecialchars($connMessage) . "</p>";
+        echo "<p style='text-align:center; color:red;'>Database connection failed: " . htmlspecialchars($connMessage) . "</p>";
         exit;
     }
 
@@ -99,19 +99,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['eventID'])) {
 
         // commit transaction
         $conn->commit();
-        echo "<p style='text-align:center; color:green;'>event and all related signups have been successfully deleted. notifications sent to attendees.</p>";
+        echo "<p style='text-align:center; color:green;'>Event and all related signups have been successfully deleted. notifications sent to attendees.</p>";
     } catch (Exception $e) {
         $conn->rollback();
-        echo "<p style='text-align:center; color:red;'>failed to delete event: " . htmlspecialchars($e->getMessage()) . "</p>";
+        echo "<p style='text-align:center; color:red;'>Failed to delete event: " . htmlspecialchars($e->getMessage()) . "</p>";
     }
 
     closeDB();
 
     echo "<div style='text-align:center; margin-top:20px;'>
-            <a href='admin_events.php'>back to event list</a>
+            <a href='admin_events.php'>Back to Event List</a>
           </div>";
 } else {
-    echo "<p style='text-align:center; color:red;'>invalid request.</p>";
+    echo "<p style='text-align:center; color:red;'>Invalid request.</p>";
 }
 ?>
 </body>

@@ -2,7 +2,7 @@
 session_start();
 include 'DBConnect.php';
 
-// Fetch unread notifications for the attendee
+// fetch unread notifications for the attendee
 $notifications = [];
 if (isset($_SESSION['username']) && $_SESSION['role'] === 'attendee') {
     $connMessage = openDB();
@@ -30,7 +30,7 @@ if (isset($_SESSION['username']) && $_SESSION['role'] === 'attendee') {
         }
         $notification_stmt->close();
 
-        // Mark notifications as read
+        // mark notifications as read
         $mark_read_stmt = $conn->prepare("UPDATE notifications SET isRead = 1 WHERE attendeeID = ?");
         $mark_read_stmt->bind_param("i", $attendeeID);
         $mark_read_stmt->execute();

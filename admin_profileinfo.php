@@ -156,9 +156,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["update"])) {
                         <td>
                             <select name="role" id="role" class="form-select" required>
                                 <option value="">--Select Role--</option>
-                                <option value="attendee" <?= ($role === "attendee") ? "selected" : "" ?>>Attendee</option>
-                                <option value="organizer" <?= ($role === "organizer") ? "selected" : "" ?>>Organizer</option>
-                                <option value="admin" <?= ($role === "admin") ? "selected" : "" ?>>Admin</option>
+                                <option value="attendee" <?= ($role === "attendee") ? "Selected" : "" ?>>Attendee</option>
+                                <option value="organizer" <?= ($role === "organizer") ? "Selected" : "" ?>>Organizer</option>
+                                <option value="admin" <?= ($role === "admin") ? "Selected" : "" ?>>Admin</option>
                             </select>
                         </td>
                     </tr>

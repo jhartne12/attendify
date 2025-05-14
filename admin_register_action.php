@@ -128,3 +128,5 @@ echo "<script>
     </script>";
 echo "</div>";
 ?>
+</body>
+</html>

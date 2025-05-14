@@ -40,7 +40,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'admin') {
                     </li>
                 </ul>
                 <?php if (isset($_SESSION['username'])): ?>
-                    <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
+                    <a href="welcome_<?php echo $_SESSION['role']; ?>.php" class="btn btn-primary">Welcome <?php echo htmlspecialchars($_SESSION['role']); ?>, <?php echo htmlspecialchars($_SESSION['username']); ?></a>
                     <a href="logout.php" class="btn btn-danger ms-2">Logout</a>
                 <?php else: ?>
                     <a href="LogInPage.php" class="btn btn-primary">Login</a>

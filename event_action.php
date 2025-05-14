@@ -59,14 +59,14 @@ if (gettype($result) === "object" && $result->num_rows > 0) {
     $row = $result->fetch_assoc();
     $organizer_id = $row['organizerID'];
 } else {
-    echo "organizer not found.";
+    echo "Organizer not found.";
     exit;
 }
 
 // check if any required fields are empty
 if (empty($event_name) || empty($event_date) || empty($event_address) || empty($event_description) || empty($event_category)) {
-    echo "all fields are required!";
-    echo "<br><br>redirecting back after 5 seconds.";
+    echo "All fields are required!";
+    echo "<br><br>Redirecting back after 5 seconds.";
     echo "<script>
         setTimeout(function() {
         window.history.back();
@@ -81,15 +81,15 @@ $sql2 = "INSERT INTO event (organizerID, Name, date, address, description, categ
 
 // execute query and check if it was successful
 if (modifyDB($sql2)) {
-    echo "event created successfully!<br>redirecting you to the front page.";
+    echo "Event created successfully!<br>Redirecting you to the front page.";
     echo "<script>
         setTimeout(function() {
         window.location.href = 'index.php';
         }, 5000);
         </script>";
 } else {
-    echo "there was an error creating the event! please try again later.";
-    echo "<br><br>redirecting back after 5 seconds.";
+    echo "There was an error creating the event! Please try again later.";
+    echo "<br><br>Redirecting back after 5 seconds.";
     echo "<script>
         setTimeout(function() {
         window.history.back();

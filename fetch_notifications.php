@@ -18,7 +18,7 @@ if ($connMessage !== "Connected") {
     exit();
 }
 
-// Fetch user ID based on role
+// fetch user ID based on role
 $userID = null;
 $idColumn = null;
 
@@ -41,7 +41,7 @@ if ($row = $result->fetch_assoc()) {
 }
 $stmt->close();
 
-// Fetch unread notifications
+// fetch unread notifications
 $notifications = [];
 if ($userID !== null) {
     $stmt = $conn->prepare("SELECT message FROM notifications WHERE $idColumn = ? AND isRead = 0 ORDER BY created_at DESC");
@@ -53,7 +53,7 @@ if ($userID !== null) {
     }
     $stmt->close();
 
-    // Mark notifications as read
+    // mark notifications as read
     $stmt = $conn->prepare("UPDATE notifications SET isRead = 1 WHERE $idColumn = ?");
     $stmt->bind_param("i", $userID);
     $stmt->execute();
