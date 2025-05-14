@@ -19,20 +19,19 @@ include 'DBConnect.php';
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
-                            Notifications
-                            <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
-                        </a>
-                        <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
-                            <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
-                        </ul>
-                    </li>
+                    <?php if (isset($_SESSION['username']) && ($_SESSION['role'] === 'attendee' || $_SESSION['role'] === 'organizer')): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
+                                Notifications
+                                <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
+                            </a>
+                            <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
+                                <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Event Register</a>
                     </li>

@@ -45,7 +45,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['eventID'])) {
 }
 
 // fetch events the attendee has registered for
-$events_stmt = $conn->prepare("SELECT event.eventID, event.Name AS eventName, event.date, event.description, event.categoryID, organizer.Name AS organizerName 
+$events_stmt = $conn->prepare("SELECT event.eventID, event.Name AS eventName, event.date, event.description, event.categoryID, event.address, organizer.Name AS organizerName 
                                FROM event
                                JOIN event_attendee ON event.eventID = event_attendee.eventID
                                JOIN organizer ON event.organizerID = organizer.organizerID
@@ -72,20 +72,19 @@ $events_result = $events_stmt->get_result();
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
-                            Notifications
-                            <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
-                        </a>
-                        <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
-                            <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
-                        </ul>
-                    </li>
+                    <?php if (isset($_SESSION['username']) && ($_SESSION['role'] === 'attendee' || $_SESSION['role'] === 'organizer')): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
+                                Notifications
+                                <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
+                            </a>
+                            <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
+                                <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="index.php">Event Register</a>
                     </li>
@@ -162,6 +161,7 @@ $events_result = $events_stmt->get_result();
                 <tr>
                     <th>Event Name</th>
                     <th>Date</th>
+                    <th>Address</th>
                     <th>Organizer</th>
                     <th>Description</th>
                     <th>Action</th>
@@ -172,6 +172,7 @@ $events_result = $events_stmt->get_result();
                     <tr>
                         <td><strong><?php echo htmlspecialchars($event['eventName']); ?></strong></td>
                         <td><?php echo htmlspecialchars($event['date']); ?></td>
+                        <td><?php echo htmlspecialchars($event['address']); ?></td>
                         <td><?php echo htmlspecialchars($event['organizerName']); ?></td>
                         <td><?php echo htmlspecialchars($event['description']); ?></td>
                         <td>
