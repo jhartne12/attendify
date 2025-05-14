@@ -31,16 +31,19 @@ $result = queryDB($sql);
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
                 <span class="navbar-toggler-icon"></span>
             </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
                         <a class="nav-link" href="admin_register.php">Create User</a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link" href="admin_events.php">Manage Events</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin_profileinfo.php">Edit Profile</a>
                     </li>
                 </ul>
                 <?php if (isset($_SESSION['username'])): ?>
@@ -57,7 +60,7 @@ $result = queryDB($sql);
         <h3 style="font-size:50px" class="text-center">Admin Event List</h3>
         <br>
         <h4 class="text-center">Available Events</h4>
-        <table class="table table-bordered w-75">
+        <table class="table registration-table table-bordered w-75">
             <thead>
                 <tr>
                     <th>Event Name</th>

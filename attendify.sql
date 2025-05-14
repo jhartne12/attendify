@@ -108,6 +108,24 @@ CREATE TABLE `organizer` (
   `securityA` varchar(50) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `notificationID` int(11) NOT NULL AUTO_INCREMENT,
+  `attendeeID` int(11) DEFAULT NULL,
+  `organizerID` int(11) DEFAULT NULL,
+  `message` varchar(255) NOT NULL,
+  `isRead` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (`notificationID`),
+  FOREIGN KEY (`attendeeID`) REFERENCES `attendee`(`attendeeID`) ON DELETE CASCADE,
+  FOREIGN KEY (`organizerID`) REFERENCES `organizer`(`organizerID`) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indexes for dumped tables
 --
@@ -191,6 +209,12 @@ ALTER TABLE `event_attendee`
 --
 ALTER TABLE `organizer`
   MODIFY `organizerID` int(3) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `notifications`
+--
+ALTER TABLE `notifications`
+  MODIFY `notificationID` int(11) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables

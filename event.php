@@ -6,6 +6,60 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
     header('Location: index.php');
     exit();
 }
+
+// Fetch unread notifications for the logged-in user
+$notifications = [];
+if (isset($_SESSION['username']) && isset($_SESSION['role']) && $_SESSION['role'] !== 'admin') {
+    $email = $_SESSION['username'];
+    $role = $_SESSION['role'];
+
+    if ($role === 'attendee') {
+        $stmt = $conn->prepare("
+            SELECT message 
+            FROM notifications 
+            WHERE attendeeID = (SELECT attendeeID FROM attendee WHERE email = ?) AND isRead = 0 
+            ORDER BY created_at DESC
+        ");
+    } elseif ($role === 'organizer') {
+        $stmt = $conn->prepare("
+            SELECT message 
+            FROM notifications 
+            WHERE organizerID = (SELECT organizerID FROM organizer WHERE email = ?) AND isRead = 0 
+            ORDER BY created_at DESC
+        ");
+    }
+
+    if (isset($stmt)) {
+        $stmt->bind_param("s", $email);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $notifications[] = $row['message'];
+        }
+        $stmt->close();
+
+        // Mark notifications as read
+        if ($role === 'attendee') {
+            $mark_read_stmt = $conn->prepare("
+                UPDATE notifications 
+                SET isRead = 1 
+                WHERE attendeeID = (SELECT attendeeID FROM attendee WHERE email = ?)
+            ");
+        } elseif ($role === 'organizer') {
+            $mark_read_stmt = $conn->prepare("
+                UPDATE notifications 
+                SET isRead = 1 
+                WHERE organizerID = (SELECT organizerID FROM organizer WHERE email = ?)
+            ");
+        }
+
+        if (isset($mark_read_stmt)) {
+            $mark_read_stmt->bind_param("s", $email);
+            $mark_read_stmt->execute();
+            $mark_read_stmt->close();
+        }
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -15,9 +69,7 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
         <title>Registration</title>
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-        <link href="registration.css" rel="stylesheet" type="text/css">
-        <link href="registraion_action.php" rel="action page" type="text/php">
-        
+        <link href="style.css" rel="stylesheet" type="text/css">
     </head>
     <body>
         <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
@@ -28,14 +80,23 @@ if (!isset($_SESSION['username']) || $_SESSION['role'] != 'organizer') {
                 </button>
                 <div class="collapse navbar-collapse" id="mynavbar">
                     <ul class="navbar-nav me-auto">
+                        <?php if (!empty($notifications)): ?>
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Notifications
+                                </a>
+                                <ul class="dropdown-menu" aria-labelledby="notificationDropdown">
+                                    <?php foreach ($notifications as $notification): ?>
+                                        <li><a class="dropdown-item" href="#"><?php echo htmlspecialchars($notification); ?></a></li>
+                                    <?php endforeach; ?>
+                                </ul>
+                            </li>
+                        <?php endif; ?>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="event.php">Create Event</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="javascript:void(0)">Link</a>
+                            <a class="nav-link" href="profileinfo.php">Edit Profile</a>
                         </li>
                     </ul>
                     <?php if (isset($_SESSION['username'])): ?>
