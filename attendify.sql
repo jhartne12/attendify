@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Apr 30, 2025 at 04:30 AM
+-- Generation Time: May 14, 2025 at 05:53 PM
 -- Server version: 10.4.32-MariaDB
 -- PHP Version: 8.2.12
 
@@ -64,6 +64,18 @@ CREATE TABLE `category` (
   `name` varchar(40) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+--
+-- Dumping data for table `category`
+--
+
+INSERT INTO `category` (`categoryID`, `name`) VALUES
+(1, 'Conference'),
+(2, 'Workshop'),
+(3, 'Seminar'),
+(4, 'Meetup'),
+(5, 'Webinar'),
+(6, 'Social');
+
 -- --------------------------------------------------------
 
 --
@@ -95,6 +107,21 @@ CREATE TABLE `event_attendee` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `notifications`
+--
+
+CREATE TABLE `notifications` (
+  `notificationID` int(11) NOT NULL,
+  `attendeeID` int(3) DEFAULT NULL,
+  `organizerID` int(3) DEFAULT NULL,
+  `message` varchar(255) NOT NULL,
+  `isRead` tinyint(1) NOT NULL DEFAULT 0,
+  `created_at` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `organizer`
 --
 
@@ -106,24 +133,6 @@ CREATE TABLE `organizer` (
   `email` varchar(40) NOT NULL,
   `securityQ` varchar(60) NOT NULL,
   `securityA` varchar(50) NOT NULL
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
-
--- --------------------------------------------------------
-
---
--- Table structure for table `notifications`
---
-
-CREATE TABLE `notifications` (
-  `notificationID` int(11) NOT NULL AUTO_INCREMENT,
-  `attendeeID` int(11) DEFAULT NULL,
-  `organizerID` int(11) DEFAULT NULL,
-  `message` varchar(255) NOT NULL,
-  `isRead` tinyint(1) NOT NULL DEFAULT 0,
-  `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
-  PRIMARY KEY (`notificationID`),
-  FOREIGN KEY (`attendeeID`) REFERENCES `attendee`(`attendeeID`) ON DELETE CASCADE,
-  FOREIGN KEY (`organizerID`) REFERENCES `organizer`(`organizerID`) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
@@ -165,6 +174,14 @@ ALTER TABLE `event_attendee`
   ADD KEY `event_attendee_attendee_fk` (`attendeeID`);
 
 --
+-- Indexes for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD PRIMARY KEY (`notificationID`),
+  ADD KEY `attendeeID` (`attendeeID`),
+  ADD KEY `organizerID` (`organizerID`);
+
+--
 -- Indexes for table `organizer`
 --
 ALTER TABLE `organizer`
@@ -190,7 +207,7 @@ ALTER TABLE `attendee`
 -- AUTO_INCREMENT for table `category`
 --
 ALTER TABLE `category`
-  MODIFY `categoryID` int(3) NOT NULL AUTO_INCREMENT;
+  MODIFY `categoryID` int(3) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
 
 --
 -- AUTO_INCREMENT for table `event`
@@ -205,16 +222,16 @@ ALTER TABLE `event_attendee`
   MODIFY `event_attendeeID` int(3) NOT NULL AUTO_INCREMENT;
 
 --
--- AUTO_INCREMENT for table `organizer`
---
-ALTER TABLE `organizer`
-  MODIFY `organizerID` int(3) NOT NULL AUTO_INCREMENT;
-
---
 -- AUTO_INCREMENT for table `notifications`
 --
 ALTER TABLE `notifications`
   MODIFY `notificationID` int(11) NOT NULL AUTO_INCREMENT;
+
+--
+-- AUTO_INCREMENT for table `organizer`
+--
+ALTER TABLE `organizer`
+  MODIFY `organizerID` int(3) NOT NULL AUTO_INCREMENT;
 
 --
 -- Constraints for dumped tables
@@ -233,6 +250,13 @@ ALTER TABLE `event`
 ALTER TABLE `event_attendee`
   ADD CONSTRAINT `event_attendee_attendee_fk` FOREIGN KEY (`attendeeID`) REFERENCES `attendee` (`attendeeID`),
   ADD CONSTRAINT `event_attendee_event_fk` FOREIGN KEY (`eventID`) REFERENCES `event` (`eventID`);
+
+--
+-- Constraints for table `notifications`
+--
+ALTER TABLE `notifications`
+  ADD CONSTRAINT `notifications_ibfk_1` FOREIGN KEY (`attendeeID`) REFERENCES `attendee` (`attendeeID`) ON DELETE CASCADE,
+  ADD CONSTRAINT `notifications_ibfk_2` FOREIGN KEY (`organizerID`) REFERENCES `organizer` (`organizerID`) ON DELETE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
