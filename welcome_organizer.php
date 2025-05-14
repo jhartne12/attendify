@@ -78,7 +78,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['eventID'])) {
 }
 
 // fetch events created by the organizer
-$events_stmt = $conn->prepare("SELECT eventID, Name AS eventName, date, description, categoryID 
+$events_stmt = $conn->prepare("SELECT eventID, Name AS eventName, date, address, description, categoryID 
                                FROM event
                                WHERE organizerID = ?");
 $events_stmt->bind_param("i", $organizerID);
@@ -103,20 +103,19 @@ $events_result = $events_stmt->get_result();
     <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="index.php">Attendify</a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#mynavbar">
-                <span class="navbar-toggler-icon"></span>
-            </button>
             <div class="collapse navbar-collapse" id="mynavbar">
                 <ul class="navbar-nav me-auto">
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
-                            Notifications
-                            <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
-                        </a>
-                        <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
-                            <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
-                        </ul>
-                    </li>
+                    <?php if (isset($_SESSION['username']) && ($_SESSION['role'] === 'attendee' || $_SESSION['role'] === 'organizer')): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" id="notificationDropdown" role="button" data-bs-toggle="dropdown" aria-expanded="false" onclick="markAllAsRead()">
+                                Notifications
+                                <span id="notificationBadge" class="badge bg-danger" style="display: none;"></span>
+                            </a>
+                            <ul class="dropdown-menu" id="notificationList" aria-labelledby="notificationDropdown">
+                                <li><a class="dropdown-item text-muted" href="#">Loading...</a></li>
+                            </ul>
+                        </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="event.php">Create Event</a>
                     </li>
@@ -193,6 +192,7 @@ $events_result = $events_stmt->get_result();
                 <tr>
                     <th>Event Name</th>
                     <th>Date</th>
+                    <th>Address</th>
                     <th>Description</th>
                     <th>Category</th>
                     <th>Action</th>
@@ -203,6 +203,7 @@ $events_result = $events_stmt->get_result();
                     <tr>
                         <td><strong><?php echo htmlspecialchars($event['eventName']); ?></strong></td>
                         <td><?php echo htmlspecialchars($event['date']); ?></td>
+                        <td><?php echo htmlspecialchars($event['address']); ?></td>
                         <td><?php echo htmlspecialchars($event['description']); ?></td>
                         <td>
                             <?php
